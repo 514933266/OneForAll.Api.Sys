@@ -15,6 +15,10 @@ using Sys.Domain.Enums;
 using System.Runtime.InteropServices;
 using Sys.Domain.Repositorys;
 using Sys.Domain.Aggregates;
+using NPOI.SS.Formula.Functions;
+using OneForAll.Core.ORM;
+using OneForAll.Core.Upload;
+using System.IO;
 
 namespace Sys.Application
 {
@@ -24,14 +28,13 @@ namespace Sys.Application
     public class SysTenantService : ISysTenantService
     {
         private readonly IMapper _mapper;
-        private readonly ISysTenantManager _tenantManager;
-
+        private readonly ISysTenantManager _manager;
         public SysTenantService(
             IMapper mapper,
-            ISysTenantManager tenantManager)
+            ISysTenantManager manager)
         {
             _mapper = mapper;
-            _tenantManager = tenantManager;
+            _manager = manager;
         }
 
         #region 租户
@@ -43,7 +46,7 @@ namespace Sys.Application
         /// <returns>租户</returns>
         public async Task<SysTenantDto> GetAsync(Guid id)
         {
-            var data = await _tenantManager.GetAsync(id);
+            var data = await _manager.GetAsync(id);
             return _mapper.Map<SysTenant, SysTenantDto>(data);
         }
 
@@ -65,7 +68,7 @@ namespace Sys.Application
             DateTime? startDate,
             DateTime? endDate)
         {
-            var data = await _tenantManager.GetPageAsync(pageIndex, pageSize, key, isEnabled, startDate, endDate);
+            var data = await _manager.GetPageAsync(pageIndex, pageSize, key, isEnabled, startDate, endDate);
             var items = _mapper.Map<IEnumerable<SysTenant>, IEnumerable<SysTenantDto>>(data.Items);
             return new PageList<SysTenantDto>(data.Total, data.PageIndex, data.PageSize, items);
         }
@@ -73,21 +76,21 @@ namespace Sys.Application
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysTenantForm entity)
+        public async Task<BaseErrType> AddAsync(SysTenantForm form)
         {
-            return await _tenantManager.AddAsync(entity);
+            return await _manager.AddAsync(form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysTenantForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysTenantForm form)
         {
-            return await _tenantManager.UpdateAsync(entity);
+            return await _manager.UpdateAsync(form);
         }
 
         /// <summary>
@@ -97,8 +100,21 @@ namespace Sys.Application
         /// <returns>结果</returns>
         public async Task<BaseErrType> DeleteAsync(IEnumerable<Guid> ids)
         {
-            return await _tenantManager.DeleteAsync(ids);
+            return await _manager.DeleteAsync(ids);
         }
+
+        /// <summary>
+        /// 上传Logo图片
+        /// </summary>
+        /// <param name="id">项目id</param>
+        /// <param name="filename">文件名称</param>
+        /// <param name="file">数据流</param>
+        /// <returns></returns>
+        public async Task<IUploadResult> UploadLogoAsync(Guid id, string filename, Stream file)
+        {
+            return await _manager.UploadLogoAsync(id, filename, file);
+        }
+
         #endregion
 
         #region 菜单
@@ -110,7 +126,7 @@ namespace Sys.Application
         /// <returns>菜单列表</returns>
         public async Task<IEnumerable<SysMenuTreeDto>> GetListMenuAsync(Guid id)
         {
-            var data = await _tenantManager.GetListMenuAsync(id);
+            var data = await _manager.GetListMenuAsync(id);
             var menus = _mapper.Map<IEnumerable<SysMenuPermissionAggr>, IEnumerable<SysMenuTreeDto>>(data);
             return menus.ToTree<SysMenuTreeDto, Guid>();
         }
@@ -126,7 +142,7 @@ namespace Sys.Application
         /// <returns>权限列表</returns>
         public async Task<IEnumerable<SysMenuPermissionDto>> GetListPermissionAsync(Guid id)
         {
-            var data = await _tenantManager.GetListPermissionAsync(id);
+            var data = await _manager.GetListPermissionAsync(id);
             return _mapper.Map<IEnumerable<SysPermission>, IEnumerable<SysMenuPermissionDto>>(data);
         }
 
@@ -138,7 +154,7 @@ namespace Sys.Application
         /// <returns>结果</returns>
         public async Task<BaseErrType> AddPermissionAsync(Guid id, IEnumerable<SysMenuPermissionForm> entities)
         {
-            return await _tenantManager.AddPermissionAsync(id, entities);
+            return await _manager.AddPermissionAsync(id, entities);
         }
         #endregion
     }

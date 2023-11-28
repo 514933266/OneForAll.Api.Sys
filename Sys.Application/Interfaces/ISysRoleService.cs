@@ -28,16 +28,16 @@ namespace Sys.Application.Interfaces
         /// 添加
         /// </summary>
         /// <param name="tenantId">租户id</param>
-        /// <param name="entity">角色</param>
+        /// <param name="form">角色</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(Guid tenantId, SysRoleForm entity);
+        Task<BaseErrType> AddAsync(Guid tenantId, SysRoleForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">角色</param>
+        /// <param name="form">角色</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysRoleForm entity);
+        Task<BaseErrType> UpdateAsync(SysRoleForm form);
 
         /// <summary>
         /// 删除

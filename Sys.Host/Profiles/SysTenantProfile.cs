@@ -14,6 +14,7 @@ namespace Sys.Host.Profiles
         public SysTenantProfile()
         {
             CreateMap<SysTenant, SysTenantDto>();
+            CreateMap<SysTenant, SysTenantSelectionDto>();
             CreateMap<SysTenantForm, SysTenant>();
         }
     }

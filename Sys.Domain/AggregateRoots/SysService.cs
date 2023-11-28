@@ -21,14 +21,14 @@ namespace Sys.Domain.AggregateRoots
         /// </summary>
         [Required]
         [Unique]
-        [MaxLength(50)]
+        [StringLength(50)]
         public string Code { get; set; }
 
         /// <summary>
         /// 服务名称
         /// </summary>
         [Required]
-        [MaxLength(200)]
+        [StringLength(200)]
         public string Name { get; set; }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Sys.Domain.AggregateRoots
         /// 服务内容
         /// </summary>
         [Required]
-        [MaxLength(500)]
+        [StringLength(500)]
         public string Content { get; set; }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Sys.Domain.AggregateRoots
         /// </summary>
         [Required]
         [Column(TypeName = "decimal(18,3)")]
-        public decimal Price { get; set; }
+        public decimal UnitPrice { get; set; }
 
         /// <summary>
         /// 价格模式

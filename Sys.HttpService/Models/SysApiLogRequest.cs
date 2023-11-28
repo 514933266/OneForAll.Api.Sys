@@ -10,7 +10,7 @@ namespace Sys.HttpService.Models
     /// <summary>
     /// API日志
     /// </summary>
-    public class SysApiLogForm
+    public class SysApiLogRequest
     {
         /// <summary>
         /// 租户id
@@ -126,5 +126,11 @@ namespace Sys.HttpService.Models
         [Required]
         [StringLength(20)]
         public string CreatorName { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        [Required]
+        public DateTime CreateTime { get; set; }
     }
 }

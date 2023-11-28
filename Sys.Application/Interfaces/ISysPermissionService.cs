@@ -30,16 +30,16 @@ namespace Sys.Application.Interfaces
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">权限</param>
+        /// <param name="form">权限</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(SysPermissionForm entity);
+        Task<BaseErrType> AddAsync(SysPermissionForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">权限</param>
+        /// <param name="form">权限</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysPermissionForm entity);
+        Task<BaseErrType> UpdateAsync(SysPermissionForm form);
 
         /// <summary>
         /// 删除

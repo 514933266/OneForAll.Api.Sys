@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Sys.Domain.Enums;
 using Sys.Domain.Aggregates;
+using OneForAll.Core.Upload;
+using System.IO;
 
 namespace Sys.Domain.Interfaces
 {
@@ -61,6 +63,15 @@ namespace Sys.Domain.Interfaces
         /// <param name="ids">租户id</param>
         /// <returns>结果</returns>
         Task<BaseErrType> DeleteAsync(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// 上传Logo
+        /// </summary>
+        /// <param name="id">项目id</param>
+        /// <param name="filename">文件名称</param>
+        /// <param name="file">数据流</param>
+        /// <returns></returns>
+        Task<IUploadResult> UploadLogoAsync(Guid id, string filename, Stream file);
 
         #endregion
 

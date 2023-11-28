@@ -4,9 +4,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core.Extension;
 using Sys.Public.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace Sys.HttpService
 {
@@ -78,7 +78,7 @@ namespace Sys.HttpService
             }
         }
 
-        protected Guid TenantId
+        protected Guid SysTenantId
         {
             get
             {
@@ -113,7 +113,7 @@ namespace Sys.HttpService
                 {
                     Id = UserId,
                     Name = name?.Value,
-                    TenantId = TenantId
+                    SysTenantId = SysTenantId
                 };
             }
         }
@@ -125,13 +125,12 @@ namespace Sys.HttpService
         /// <returns></returns>
         protected HttpClient GetHttpClient(string name)
         {
+            var client = _httpClientFactory.CreateClient(name);
             if (!Token.IsNullOrEmpty())
             {
-                var client = _httpClientFactory.CreateClient(name);
                 client.DefaultRequestHeaders.Add(AUTH_KEY, Token);
-                return client;
             }
-            return null;
+            return client;
         }
     }
 }

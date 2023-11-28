@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Sys.Domain.Enums;
+using OneForAll.Core.Upload;
+using System.IO;
 
 namespace Sys.Application.Interfaces
 {
@@ -44,16 +46,16 @@ namespace Sys.Application.Interfaces
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(SysTenantForm entity);
+        Task<BaseErrType> AddAsync(SysTenantForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysTenantForm entity);
+        Task<BaseErrType> UpdateAsync(SysTenantForm form);
 
         /// <summary>
         /// 删除
@@ -61,6 +63,15 @@ namespace Sys.Application.Interfaces
         /// <param name="ids">菜单id</param>
         /// <returns>结果</returns>
         Task<BaseErrType> DeleteAsync(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// 上传Logo图片
+        /// </summary>
+        /// <param name="id">项目id</param>
+        /// <param name="filename">文件名称</param>
+        /// <param name="file">数据流</param>
+        /// <returns></returns>
+        Task<IUploadResult> UploadLogoAsync(Guid id, string filename, Stream file);
 
         #endregion
 

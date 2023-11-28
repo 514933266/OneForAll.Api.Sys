@@ -46,21 +46,21 @@ namespace Sys.Application
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">用户</param>
+        /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysUserForm entity)
+        public async Task<BaseErrType> AddAsync(SysUserForm form)
         {
-            return await _userManager.AddAsync(entity);
+            return await _userManager.AddAsync(form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">用户</param>
+        /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysUserForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysUserForm form)
         {
-            return await _userManager.UpdateAsync(entity);
+            return await _userManager.UpdateAsync(form);
         }
 
         /// <summary>

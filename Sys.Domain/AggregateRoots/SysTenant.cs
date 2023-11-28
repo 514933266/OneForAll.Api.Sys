@@ -32,14 +32,22 @@ namespace Sys.Domain.AggregateRoots
         /// 名称
         /// </summary>
         [Required]
-        [MaxLength(50)]
+        [StringLength(50)]
         public string Name { get; set; }
 
+        /// <summary>
+        /// 企业Logo
+        /// </summary>
+        [Required]
+        [StringLength(1000)]
+        public string LogoUrl { get; set; } = "";
+        
+        
         /// <summary>
         /// 负责人
         /// </summary>
         [Required]
-        [MaxLength(50)]
+        [StringLength(50)]
         public string Manager { get; set; } = "";
 
         /// <summary>
@@ -53,7 +61,7 @@ namespace Sys.Domain.AggregateRoots
         /// 地址
         /// </summary>
         [Required]
-        [MaxLength(300)]
+        [StringLength(300)]
         public string Address { get; set; } = "";
 
         /// <summary>
@@ -72,7 +80,7 @@ namespace Sys.Domain.AggregateRoots
         /// 描述
         /// </summary>
         [Required]
-        [MaxLength(300)]
+        [StringLength(300)]
         public string Description { get; set; } = "";
 
         /// <summary>

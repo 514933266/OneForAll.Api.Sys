@@ -129,7 +129,7 @@ namespace Sys.Domain
                 var extension = Path.GetExtension(filename);
                 var name = Path.GetFileNameWithoutExtension(filename);
                 filename = name.ToMd5().Append(extension);
-                result = await _uploader.WriteAsync(file, UPLOAD_PATH.Fmt(id), filename, 1 * 1024 * 1024 * 1024) as UploadResult;
+                result = await _uploader.WriteAsync(file, UPLOAD_PATH.Fmt(id), filename, 1 * 1024 * 1024) as UploadResult;
                 // 设置返回虚拟路径
                 if (result.State.Equals(UploadEnum.Success))
                 {

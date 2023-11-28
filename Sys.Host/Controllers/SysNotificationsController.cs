@@ -19,7 +19,7 @@ namespace Sys.Host.Controllers
     /// 系统通知
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Roles = UserRoleType.RULER)]
+    [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysNotificationsController : BaseController
     {
         private readonly ISysNotificationService _service;
@@ -40,6 +40,7 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<PageList<SysNotificationDto>> GetPageAsync(
             int pageIndex,
             int pageSize,
@@ -54,6 +55,7 @@ namespace Sys.Host.Controllers
         /// 添加
         /// </summary>
         [HttpPost]
+        [CheckPermission]
         public async Task<BaseMessage> AddAsync([FromBody] SysNotificationForm entity)
         {
             var msg = new BaseMessage();
@@ -70,6 +72,7 @@ namespace Sys.Host.Controllers
         /// 修改
         /// </summary>
         [HttpPut]
+        [CheckPermission]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysNotificationForm entity)
         {
 
@@ -90,6 +93,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
+        [CheckPermission]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();
@@ -107,6 +111,7 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpPost]
         [Route("{id}/Images")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> UploadImageAsync(Guid id, [FromForm] IFormCollection form)
         {
             var msg = new BaseMessage();
@@ -133,6 +138,7 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpPatch]
         [Route("{id}/IsPublish")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> PublishAsync(Guid id)
         {
             var msg = new BaseMessage();

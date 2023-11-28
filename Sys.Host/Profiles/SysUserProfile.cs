@@ -20,8 +20,10 @@ namespace Sys.Host.Profiles
 
             CreateMap<SysUser, SysUserDto>()
                 .ForMember(t => t.TenantId, a => a.MapFrom(s => s.SysTenantId));
+            CreateMap<SysUser, SysWxLoginUserDto>();
             CreateMap<SysUserForm, SysUser>()
                 .ForMember(t => t.SysTenantId, a => a.MapFrom(s => s.TenantId));
+
         }
     }
 }

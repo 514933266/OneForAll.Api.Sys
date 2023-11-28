@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Sys.Application.Dtos
@@ -26,6 +27,11 @@ namespace Sys.Application.Dtos
         /// 名称
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// 企业Logo
+        /// </summary>
+        public string LogoUrl { get; set; }
 
         /// <summary>
         /// 负责人

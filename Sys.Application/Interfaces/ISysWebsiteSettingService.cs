@@ -44,16 +44,16 @@ namespace Sys.Application.Interfaces
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">权限</param>
+        /// <param name="form">权限</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(SysWebsiteSettingForm entity);
+        Task<BaseErrType> AddAsync(SysWebsiteSettingForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">权限</param>
+        /// <param name="form">权限</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysWebsiteSettingForm entity);
+        Task<BaseErrType> UpdateAsync(SysWebsiteSettingForm form);
 
         /// <summary>
         /// 删除
@@ -84,17 +84,17 @@ namespace Sys.Application.Interfaces
         /// 添加
         /// </summary>
         /// <param name="id">实体id</param>
-        /// <param name="entity">表单</param>
+        /// <param name="form">表单</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddApiAsync(Guid id, SysWebsiteApiSettingForm entity);
+        Task<BaseErrType> AddApiAsync(Guid id, SysWebsiteApiSettingForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="id">实体id</param>
-        /// <param name="entity">表单</param>
+        /// <param name="form">表单</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateApiAsync(Guid id, SysWebsiteApiSettingForm entity);
+        Task<BaseErrType> UpdateApiAsync(Guid id, SysWebsiteApiSettingForm form);
 
         /// <summary>
         /// 删除

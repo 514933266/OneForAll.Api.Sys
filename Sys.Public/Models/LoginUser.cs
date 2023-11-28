@@ -19,7 +19,7 @@ namespace Sys.Public.Models
         /// <summary>
         /// 所属租户id
         /// </summary>
-        public Guid TenantId { get; set; }
+        public Guid SysTenantId { get; set; }
 
         /// <summary>
         /// 名称

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using OneForAll.Core;
 using System.Collections.Generic;
 using Sys.Public.Models;
+using Sys.Host.Filters;
 
 namespace Sys.Host.Controllers
 {
@@ -16,7 +17,7 @@ namespace Sys.Host.Controllers
     /// 用户
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Roles = UserRoleType.RULER)]
+    [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysUsersController : BaseController
     {
         private readonly ISysUserService _userService;
@@ -35,10 +36,8 @@ namespace Sys.Host.Controllers
         /// <returns>用户列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        public async Task<PageList<SysUserDto>> GetAsync(
-            int pageIndex,
-            int pageSize,
-            [FromQuery] string key)
+        [CheckPermission(Action = ConstPermission.VIEW)]
+        public async Task<PageList<SysUserDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _userService.GetPageAsync(pageIndex, pageSize, key);
         }
@@ -49,6 +48,7 @@ namespace Sys.Host.Controllers
         /// <param name="entity">表单</param>
         /// <returns>结果</returns>
         [HttpPost]
+        [CheckPermission]
         public async Task<BaseMessage> AddAsync([FromBody] SysUserForm entity)
         {
             var msg = new BaseMessage();
@@ -70,6 +70,7 @@ namespace Sys.Host.Controllers
         /// <param name="entity">表单</param>
         /// <returns>结果</returns>
         [HttpPut]
+        [CheckPermission]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysUserForm entity)
         {
             var msg = new BaseMessage();
@@ -91,6 +92,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
+        [CheckPermission]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();

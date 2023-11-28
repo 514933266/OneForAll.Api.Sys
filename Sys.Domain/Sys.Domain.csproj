@@ -16,14 +16,15 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="OneForAll.Core" Version="1.2.0.3" />
-    <PackageReference Include="OneForAll.EFCore" Version="1.2.2.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OneForAll.Core" Version="1.2.0.4" />
+    <PackageReference Include="OneForAll.EFCore" Version="1.2.2.6" />
     <PackageReference Include="OneForAll.File" Version="1.2.0" />
     <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sys.HttpService\Sys.HttpService.csproj" />
     <ProjectReference Include="..\Sys.Public\Sys.Public.csproj" />
   </ItemGroup>
 

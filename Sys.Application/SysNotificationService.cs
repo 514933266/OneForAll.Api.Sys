@@ -73,21 +73,21 @@ namespace Sys.Application
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysNotificationForm entity)
+        public async Task<BaseErrType> AddAsync(SysNotificationForm form)
         {
-            return await _manager.AddAsync(entity);
+            return await _manager.AddAsync(form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysNotificationForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysNotificationForm form)
         {
-            return await _manager.UpdateAsync(entity);
+            return await _manager.UpdateAsync(form);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Sys.Application
         public async Task<BaseErrType> PublishAsync(Guid id)
         {
             var data = await _repository.FindAsync(id);
-            var msg = new UmsMessageForm()
+            var msg = new UmsMessageRequest()
             {
                 Title = data.Title,
                 Content = data.Content,

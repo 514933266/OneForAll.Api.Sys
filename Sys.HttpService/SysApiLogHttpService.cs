@@ -30,23 +30,19 @@ namespace Sys.HttpService
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns></returns>
-        public async Task AddAsync(SysApiLogForm entity)
+        public async Task AddAsync(SysApiLogRequest form)
         {
-            try
-            {
-                entity.CreatorId = LoginUser.Id;
-                entity.CreatorName = LoginUser.Name;
-                entity.TenantId = LoginUser.TenantId;
+            form.CreatorId = LoginUser.Id;
+            form.CreatorName = LoginUser.Name;
+            form.TenantId = LoginUser.SysTenantId;
+            form.CreateTime = DateTime.Now;
 
-                var client = GetHttpClient(_config.SysApiLog);
-                if (client != null)
-                    await client.PostAsync(client.BaseAddress, entity, new JsonMediaTypeFormatter());
-            }
-            catch
+            var client = GetHttpClient(_config.SysApiLog);
+            if (client != null && client.BaseAddress != null)
             {
-
+                await client.PostAsync(client.BaseAddress, form, new JsonMediaTypeFormatter());
             }
         }
     }

@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NPOI.POIFS.FileSystem;
 using Sys.Domain.Aggregates;
+using OneForAll.Core.Extension;
 
 namespace Sys.Domain
 {
@@ -71,7 +72,7 @@ namespace Sys.Domain
             var data = _mapper.Map<IEnumerable<SysPermissionForm>, IEnumerable<SysPermission>>(forms);
             if (!data.Any())
                 return BaseErrType.DataEmpty;
-
+            data.ForEach(e => e.Id = Guid.Empty);// 清空Id，自动生成
             if (data.Count() == 1)
             {
                 var form = data.First();

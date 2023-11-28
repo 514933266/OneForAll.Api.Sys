@@ -87,21 +87,21 @@ namespace Sys.Application
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysWebsiteSettingForm entity)
+        public async Task<BaseErrType> AddAsync(SysWebsiteSettingForm form)
         {
-            return await _manager.AddAsync(entity);
+            return await _manager.AddAsync(form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysWebsiteSettingForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysWebsiteSettingForm form)
         {
-            return await _manager.UpdateAsync(entity);
+            return await _manager.UpdateAsync(form);
         }
 
         /// <summary>
@@ -143,22 +143,22 @@ namespace Sys.Application
         /// 添加
         /// </summary>
         /// <param name="id">实体id</param>
-        /// <param name="entity">表单</param>
+        /// <param name="form">表单</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddApiAsync(Guid id, SysWebsiteApiSettingForm entity)
+        public async Task<BaseErrType> AddApiAsync(Guid id, SysWebsiteApiSettingForm form)
         {
-            return await _apiManager.AddAsync(id, entity);
+            return await _apiManager.AddAsync(id, form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="id">实体id</param>
-        /// <param name="entity">表单</param>
+        /// <param name="form">表单</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateApiAsync(Guid id, SysWebsiteApiSettingForm entity)
+        public async Task<BaseErrType> UpdateApiAsync(Guid id, SysWebsiteApiSettingForm form)
         {
-            return await _apiManager.UpdateAsync(id, entity);
+            return await _apiManager.UpdateAsync(id, form);
         }
 
         /// <summary>

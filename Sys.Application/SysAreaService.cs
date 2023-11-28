@@ -69,21 +69,21 @@ namespace Sys.Application
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysAreaForm entity)
+        public async Task<BaseErrType> AddAsync(SysAreaForm form)
         {
-            return await _areaManageer.AddAsync(entity);
+            return await _areaManageer.AddAsync(form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysAreaForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysAreaForm form)
         {
-            return await _areaManageer.UpdateAsync(entity);
+            return await _areaManageer.UpdateAsync(form);
         }
 
         /// <summary>

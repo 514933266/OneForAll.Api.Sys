@@ -30,6 +30,10 @@ using OneForAll.File;
 using Sys.Host.Hubs;
 using Sys.HttpService.Models;
 using Sys.Public.Models;
+using Quartz.Impl;
+using Quartz.Spi;
+using Quartz;
+using Sys.Host.Providers;
 
 namespace Sys.Host
 {
@@ -37,6 +41,7 @@ namespace Sys.Host
     {
         const string CORS = "Cors";
         const string AUTH = "Auth";
+        private readonly string QUARTZ = "Quartz";
         const string BASE_HOST = "Sys.Host";
         const string BASE_APPLICATION = "Sys.Application";
         const string BASE_DOMAIN = "Sys.Domain";
@@ -58,11 +63,24 @@ namespace Sys.Host
 
             var corsConfig = new CorsConfig();
             Configuration.GetSection(CORS).Bind(corsConfig);
-            services.AddCors(option => option.AddPolicy(CORS, policy => policy
-                .AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-            ));
+            if (corsConfig.Origins.Contains("*") || !corsConfig.Origins.Any())
+            {
+                // 不限制跨域
+                services.AddCors(option => option.AddPolicy(CORS, policy => policy
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                ));
+            }
+            else
+            {
+                services.AddCors(option => option.AddPolicy(CORS, policy => policy
+                    .WithOrigins(corsConfig.Origins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod().
+                    AllowCredentials()
+                ));
+            }
 
             #endregion
 
@@ -98,6 +116,31 @@ namespace Sys.Host
                     Type = SecuritySchemeType.ApiKey
                 });
             });
+            #endregion
+
+            #region Quartz
+
+            var quartzConfig = new QuartzScheduleJobConfig();
+            Configuration.GetSection(QUARTZ).Bind(quartzConfig);
+            // 注册QuartzJobs目录下的定时任务
+            if (quartzConfig != null)
+            {
+                services.AddSingleton(quartzConfig);
+                services.AddSingleton<IJobFactory, ScheduleJobFactory>();
+                services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+                services.AddHostedService<QuartzJobHostService>();
+                var jobNamespace = BASE_HOST.Append(".QuartzJobs");
+                quartzConfig.ScheduleJobs.ForEach(e =>
+                {
+                    var typeName = jobNamespace + "." + e.TypeName;
+                    var jobType = Assembly.Load(BASE_HOST).GetType(typeName);
+                    if (jobType != null)
+                    {
+                        e.JobType = jobType;
+                        services.AddSingleton(e.JobType);
+                    }
+                });
+            }
             #endregion
 
             #region Http
@@ -164,7 +207,7 @@ namespace Sys.Host
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            });
+            }).AddXmlSerializerFormatters();
             #endregion
         }
 
@@ -210,6 +253,7 @@ namespace Sys.Host
             }
 
             DirectoryHelper.Create(Path.Combine(Directory.GetCurrentDirectory(), @"upload"));
+            app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions()
             {
                 FileProvider = new PhysicalFileProvider(
@@ -228,6 +272,7 @@ namespace Sys.Host
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.UseMiddleware<GlobalExceptionMiddleware>();
             app.UseMiddleware<ApiLogMiddleware>();
 
             app.UseEndpoints(endpoints =>

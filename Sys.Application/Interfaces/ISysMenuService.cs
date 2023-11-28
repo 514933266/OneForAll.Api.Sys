@@ -25,9 +25,9 @@ namespace Sys.Application.Interfaces
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">菜单</param>
+        /// <param name="form">菜单</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(SysMenuForm entity);
+        Task<BaseErrType> AddAsync(SysMenuForm form);
 
         /// <summary>
         /// 克隆
@@ -40,9 +40,9 @@ namespace Sys.Application.Interfaces
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">菜单</param>
+        /// <param name="form">菜单</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysMenuForm entity);
+        Task<BaseErrType> UpdateAsync(SysMenuForm form);
 
         /// <summary>
         /// 启用

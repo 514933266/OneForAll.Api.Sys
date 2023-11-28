@@ -9,7 +9,7 @@ namespace Sys.HttpService.Models
     /// <summary>
     /// 权限验证模型
     /// </summary>
-    public class SysPermissionCheck
+    public class SysPermissionCheckRequest
     {
         /// <summary>
         /// 租户id

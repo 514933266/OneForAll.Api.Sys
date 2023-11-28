@@ -19,7 +19,7 @@ namespace Sys.Host.Controllers
     /// 网站设置
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Roles = UserRoleType.RULER)]
+    [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysWebsiteSettingsController : BaseController
     {
         private readonly ISysWebsiteSettingService _service;
@@ -37,6 +37,7 @@ namespace Sys.Host.Controllers
         /// <returns>分页列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<PageList<SysWebsiteSettingDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _service.GetPageAsync(pageIndex, pageSize, key);
@@ -49,6 +50,7 @@ namespace Sys.Host.Controllers
         /// <returns>实体</returns>
         [HttpGet]
         [Route("{id}")]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<SysWebsiteSettingDto> GetAsync(Guid id)
         {
             return await _service.GetAsync(id);
@@ -60,6 +62,7 @@ namespace Sys.Host.Controllers
         /// <param name="entity">表单</param>
         /// <returns>结果</returns>
         [HttpPost]
+        [CheckPermission]
         public async Task<BaseMessage> AddAsync([FromBody] SysWebsiteSettingForm entity)
         {
             var msg = new BaseMessage();
@@ -79,6 +82,7 @@ namespace Sys.Host.Controllers
         /// <param name="entity">表单</param>
         /// <returns>结果</returns>
         [HttpPut]
+        [CheckPermission]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysWebsiteSettingForm entity)
         {
             var msg = new BaseMessage();
@@ -99,6 +103,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
+        [CheckPermission]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();
@@ -121,6 +126,7 @@ namespace Sys.Host.Controllers
         /// <returns>实体</returns>
         [HttpGet]
         [Route("{id}/Apis")]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<IEnumerable<SysWebsiteApiSettingDto>> GetListApiAsync(Guid id)
         {
             return await _service.GetListApiAsync(id);
@@ -134,6 +140,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/Apis")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> AddApiAsync(Guid id, [FromBody] SysWebsiteApiSettingForm entity)
         {
             var msg = new BaseMessage();
@@ -155,6 +162,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPut]
         [Route("{id}/Apis")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> UpdateApiAsync(Guid id, [FromBody] SysWebsiteApiSettingForm entity)
         {
             var msg = new BaseMessage();
@@ -176,6 +184,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("{id}/Apis/Batch/IsDeleted")]
+        [CheckPermission(Action = ConstPermission.DELETE)]
         public async Task<BaseMessage> DeleteApiAsync(Guid id, [FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();
@@ -201,6 +210,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/BackgroundUrl")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> UploadImageAsync(Guid id, [FromForm] IFormCollection form)
         {
             var msg = new BaseMessage();

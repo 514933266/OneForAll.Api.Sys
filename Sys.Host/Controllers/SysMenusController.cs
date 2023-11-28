@@ -9,6 +9,7 @@ using Sys.Host.Models;
 using Sys.Domain.Models;
 using Sys.Application.Interfaces;
 using Sys.Public.Models;
+using Sys.Host.Filters;
 
 namespace Sys.Host.Controllers
 {
@@ -16,7 +17,7 @@ namespace Sys.Host.Controllers
     /// 菜单
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Roles = UserRoleType.RULER)]
+    [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysMenusController : BaseController
     {
         private readonly ISysMenuService _menuService;
@@ -35,6 +36,7 @@ namespace Sys.Host.Controllers
         /// <param name="key"></param>
         /// <returns>菜单树</returns>
         [HttpGet]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<IEnumerable<SysMenuTreeDto>> GetListAsync(
             [FromQuery] bool hasPerms = false,
             [FromQuery] Guid? parentId = null,
@@ -51,6 +53,7 @@ namespace Sys.Host.Controllers
         /// <param name="entity">菜单表单</param>
         /// <returns>结果</returns>
         [HttpPost]
+        [CheckPermission(Action = ConstPermission.ADD)]
         public async Task<BaseMessage> AddAsync([FromBody] SysMenuForm entity)
         {
             var msg = new BaseMessage();
@@ -72,6 +75,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/Children")]
+        [CheckPermission(Action = ConstPermission.ADD)]
         public async Task<BaseMessage> CopyAsync(Guid id, [FromBody] IEnumerable<Guid> mids)
         {
             var msg = new BaseMessage();
@@ -92,6 +96,7 @@ namespace Sys.Host.Controllers
         /// <param name="entity">菜单表单</param>
         /// <returns>结果</returns>
         [HttpPut]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysMenuForm entity)
         {
             var msg = new BaseMessage() { Status = false };
@@ -113,6 +118,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPatch]
         [Route("{id}/IsEnabled")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> UpdateAsync(Guid id, [FromQuery] bool isEnable)
         {
             var msg = new BaseMessage() { Status = false };
@@ -134,6 +140,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPatch]
         [Route("{id}/SortNumber")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> UpdateAsync(Guid id, [FromQuery] int sortNumber)
         {
             var msg = new BaseMessage() { Status = false };
@@ -154,6 +161,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
+        [CheckPermission]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();
@@ -179,6 +187,7 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{id}/Permissions")]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<IEnumerable<SysMenuPermissionDto>> GetListPermissionAsync(Guid id)
         {
             return await _menuService.GetListPermissionAsync(id);
@@ -192,6 +201,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/Permissions")]
+        [CheckPermission(Action = ConstPermission.ADD)]
         public async Task<BaseMessage> AddPermissionAsync(Guid id, [FromBody] IEnumerable<SysMenuPermissionForm> form)
         {
             var msg = new BaseMessage();
@@ -215,6 +225,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPut]
         [Route("{id}/Permissions")]
+        [CheckPermission(Action = ConstPermission.UPDATE)]
         public async Task<BaseMessage> UpdatePermissionAsync(Guid id, [FromBody] SysMenuPermissionForm form)
         {
             var msg = new BaseMessage();
@@ -237,6 +248,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPatch]
         [Route("{id}/Permissions/Batch/IsDeleted")]
+        [CheckPermission(Action = ConstPermission.DELETE)]
         public async Task<BaseMessage> DeletePermissionAsync(Guid id, [FromBody] IEnumerable<Guid> permIds)
         {
             var msg = new BaseMessage();

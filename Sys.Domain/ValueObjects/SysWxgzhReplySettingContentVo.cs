@@ -1,28 +1,28 @@
-﻿using OneForAll.Core.DDD;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sys.Domain.AggregateRoots
+namespace Sys.Domain.ValueObjects
 {
     /// <summary>
-    /// 套餐内容
+    /// 微信公众号消息返回内容设置
     /// </summary>
-    public class SysServicePackageContact : Entity<Guid>
+    public class SysWxgzhReplySettingContentVo
     {
         /// <summary>
-        /// 套餐id
+        /// 字段名称
         /// </summary>
         [Required]
-        public Guid PackageId { get; set; }
+        [StringLength(20)]
+        public string Name { get; set; }
 
         /// <summary>
-        /// 服务id
+        /// 替换值
         /// </summary>
         [Required]
-        public Guid ServiceId { get; set; }
+        public string Value { get; set; }
     }
 }

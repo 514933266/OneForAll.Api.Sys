@@ -1,9 +1,11 @@
-﻿using OneForAll.Core;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using OneForAll.Core;
 using OneForAll.Core.DDD;
 using Sys.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +21,7 @@ namespace Sys.Domain.AggregateRoots
         /// 标题
         /// </summary>
         [Required]
-        [MaxLength(100)]
+        [StringLength(100)]
         public string Title { get; set; }
 
         /// <summary>
@@ -44,12 +46,14 @@ namespace Sys.Domain.AggregateRoots
         /// 创建时间
         /// </summary>
         [Required]
+        [Column(TypeName = "datetime")]
         public DateTime CreateTime { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 创建时间
         /// </summary>
         [Required]
+        [Column(TypeName = "datetime")]
         public DateTime? UpdateTime { get; set; } = DateTime.Now;
     }
 }

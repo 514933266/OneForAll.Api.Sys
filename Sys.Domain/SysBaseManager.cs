@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using AutoMapper;
 using OneForAll.Core.DDD;
 using Sys.Public.Models;
+using Sys.Domain.AggregateRoots;
 
 namespace Sys.Domain
 {
@@ -60,7 +61,7 @@ namespace Sys.Domain
             }
         }
 
-        protected Guid TenantId
+        protected Guid SysTenantId
         {
             get
             {
@@ -95,7 +96,7 @@ namespace Sys.Domain
                 {
                     Id = UserId,
                     Name = name.Value,
-                    TenantId = TenantId,
+                    SysTenantId = SysTenantId,
                     IsDefault = role.Value.Equals(UserRoleType.RULER)
                 };
             }

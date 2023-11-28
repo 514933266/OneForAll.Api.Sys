@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 using OneForAll.Core;
 using Sys.Application.Dtos;
 using System.Threading.Tasks;
-using Sys.Host.Models;
 using Sys.Domain.Models;
 using Sys.Application.Interfaces;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ namespace Sys.Host.Controllers
     /// 权限
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Roles = UserRoleType.RULER)]
+    [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysPermissionsController : BaseController
     {
         private readonly ISysPermissionService _permService;
@@ -37,11 +36,8 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        public async Task<PageList<SysPermissionDto>> GetPageAsync(
-            int pageIndex,
-            int pageSize,
-            [FromQuery] string key,
-            [FromQuery] Guid menuId)
+        [CheckPermission(Action = ConstPermission.VIEW)]
+        public async Task<PageList<SysPermissionDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key, [FromQuery] Guid menuId)
         {
             return await _permService.GetPageAsync(pageIndex, pageSize, key, menuId);
         }
@@ -50,6 +46,7 @@ namespace Sys.Host.Controllers
         /// 添加
         /// </summary>
         [HttpPost]
+        [CheckPermission]
         public async Task<BaseMessage> AddAsync([FromBody] SysPermissionForm entity)
         {
             var msg = new BaseMessage();
@@ -68,6 +65,7 @@ namespace Sys.Host.Controllers
         /// 修改
         /// </summary>
         [HttpPut]
+        [CheckPermission]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysPermissionForm entity)
         {
 
@@ -90,6 +88,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
+        [CheckPermission]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();

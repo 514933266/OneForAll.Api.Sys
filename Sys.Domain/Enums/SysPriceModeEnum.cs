@@ -22,23 +22,28 @@ namespace Sys.Domain.Enums
         Once = 0,
 
         /// <summary>
+        /// 按小时付费
+        /// </summary>
+        Hour = 1,
+
+        /// <summary>
         /// 按日付费
         /// </summary>
-        Day = 1,
+        Day = 2,
 
         /// <summary>
         /// 按月付费
         /// </summary>
-        Month = 2,
+        Month = 3,
 
         /// <summary>
         /// 按年付费
         /// </summary>
-        Year = 3,
+        Year = 4,
 
         /// <summary>
         /// 按量收费
         /// </summary>
-        Quantity = 4
+        Quantity = 5
     }
 }

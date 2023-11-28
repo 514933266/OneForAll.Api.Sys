@@ -58,11 +58,11 @@ namespace Sys.Application
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">菜单</param>
+        /// <param name="form">菜单</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysMenuForm entity)
+        public async Task<BaseErrType> AddAsync(SysMenuForm form)
         {
-            return await _manager.AddAsync(entity);
+            return await _manager.AddAsync(form);
         }
 
         /// <summary>
@@ -79,11 +79,11 @@ namespace Sys.Application
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">菜单</param>
+        /// <param name="form">菜单</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysMenuForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysMenuForm form)
         {
-            return await _manager.UpdateAsync(entity);
+            return await _manager.UpdateAsync(form);
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace Sys.HttpService.Models
     /// <summary>
     /// 系统通知
     /// </summary>
-    public class UmsMessageForm
+    public class UmsMessageRequest
     {
         /// <summary>
         /// 标题

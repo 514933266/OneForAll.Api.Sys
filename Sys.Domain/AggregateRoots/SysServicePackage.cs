@@ -22,14 +22,14 @@ namespace Sys.Domain.AggregateRoots
         /// </summary>
         [Required]
         [Unique]
-        [MaxLength(50)]
+        [StringLength(50)]
         public string Code { get; set; }
 
         /// <summary>
         /// 名称
         /// </summary>
         [Required]
-        [MaxLength(200)]
+        [StringLength(200)]
         public string Name { get; set; }
 
         /// <summary>
@@ -69,5 +69,11 @@ namespace Sys.Domain.AggregateRoots
         /// </summary>
         [Column(TypeName = "datetime")]
         public DateTime? EndTime { get; set; }
+
+        /// <summary>
+        /// 服务Json
+        /// </summary>
+        [Required]
+        public string ServiceJson { get; set; }
     }
 }

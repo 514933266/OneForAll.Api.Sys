@@ -34,7 +34,7 @@ namespace Sys.Domain.AggregateRoots
         /// 用户账号
         /// </summary>
         [Required]
-        [MaxLength(20)]
+        [StringLength(20)]
         public string UserName { get; set; }
     }
 }

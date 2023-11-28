@@ -49,21 +49,21 @@ namespace Sys.Application
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysPermissionForm entity)
+        public async Task<BaseErrType> AddAsync(SysPermissionForm form)
         {
-            return await _permManager.AddAsync(entity);
+            return await _permManager.AddAsync(form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysPermissionForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysPermissionForm form)
         {
-            return await _permManager.UpdateAsync(entity);
+            return await _permManager.UpdateAsync(form);
         }
 
         /// <summary>

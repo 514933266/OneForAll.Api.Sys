@@ -17,16 +17,25 @@ using OneForAll.Core.Security;
 using Sys.Domain.Enums;
 using NPOI.POIFS.Properties;
 using Sys.Domain.Aggregates;
+using OneForAll.Core.Upload;
+using OneForAll.File;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace Sys.Domain
 {
     /// <summary>
     /// 租户（租户）
     /// </summary>
-    public class SysTenantManager: BaseManager, ISysTenantManager
-    {
-        private readonly IMapper _mapper;
-        private readonly ISysTenantRepository _tenantRepository;
+    public class SysTenantManager: SysBaseManager, ISysTenantManager
+    { 
+        // 文件存储路径
+        private readonly string UPLOAD_PATH = "/upload/logos/";
+        // 虚拟路径：根据Startup配置设置,返回给前端访问资源
+        private readonly string VIRTUAL_PATH = "/resources/logos/";
+
+        private readonly IUploader _uploader;
+        private readonly ISysTenantRepository _repository;
         private readonly ISysPermissionRepository _permRepository;
         private readonly ISysUserRepository _userRepository;
         private readonly ISysMenuRepository _menuRepository;
@@ -35,15 +44,17 @@ namespace Sys.Domain
 
         public SysTenantManager(
             IMapper mapper,
-            ISysTenantRepository tenantRepository,
+            IUploader uploader,
+            IHttpContextAccessor httpContextAccessor,
+            ISysTenantRepository repository,
             ISysPermissionRepository permRepository,
             ISysUserRepository userRepository,
             ISysMenuRepository menuRepository,
             ISysTenantPermContactRepository contactRepository,
-            ISysUsertPermContactRepository userContactRepository)
+            ISysUsertPermContactRepository userContactRepository) : base(mapper, httpContextAccessor)
         {
-            _mapper = mapper;
-            _tenantRepository = tenantRepository;
+            _uploader = uploader;
+            _repository = repository;
             _permRepository = permRepository;
             _userRepository = userRepository;
             _menuRepository = menuRepository;
@@ -60,7 +71,7 @@ namespace Sys.Domain
         /// <returns>租户</returns>
         public async Task<SysTenant> GetAsync(Guid id)
         {
-            return await _tenantRepository.FindAsync(id);
+            return await _repository.FindAsync(id);
         }
 
         /// <summary>
@@ -84,7 +95,7 @@ namespace Sys.Domain
             if (pageIndex < 1)  pageIndex = 1;
             if (pageSize < 1)   pageSize = 10;
             if (pageSize > 100) pageSize = 100;
-            return await _tenantRepository.GetPageAsync(pageIndex, pageSize, key, isEnabled, startDate, endDate);
+            return await _repository.GetPageAsync(pageIndex, pageSize, key, isEnabled, startDate, endDate);
         }
 
         /// <summary>
@@ -94,9 +105,9 @@ namespace Sys.Domain
         /// <returns>结果</returns>
         public async Task<BaseErrType> AddAsync(SysTenantForm entity)
         {
-            var data = await _tenantRepository.GetByNameAsync(entity.Name);
+            var data = await _repository.GetByNameAsync(entity.Name);
             if (data != null) return BaseErrType.DataExist;
-            data = await _tenantRepository.GetByCodeAsync(entity.Code);
+            data = await _repository.GetByCodeAsync(entity.Code);
             if (data != null) return BaseErrType.DataExist;
 
             data = _mapper.Map<SysTenantForm, SysTenant>(entity);
@@ -104,7 +115,7 @@ namespace Sys.Domain
             {
                 data.Code = StringHelper.GetRandomString(18);
             }
-            return await ResultAsync(() => _tenantRepository.AddAsync(data));
+            return await ResultAsync(() => _repository.AddAsync(data));
         }
 
         /// <summary>
@@ -114,14 +125,14 @@ namespace Sys.Domain
         /// <returns>结果</returns>
         public async Task<BaseErrType> UpdateAsync(SysTenantForm entity)
         {
-            var data = await _tenantRepository.GetByNameAsync(entity.Name);
+            var data = await _repository.GetByNameAsync(entity.Name);
             if (data != null && data.Id != entity.Id) return BaseErrType.DataExist;
-            data = await _tenantRepository.GetByCodeAsync(entity.Code);
+            data = await _repository.GetByCodeAsync(entity.Code);
             if (data != null && data.Id != entity.Id) return BaseErrType.DataExist;
 
-            data = await _tenantRepository.FindAsync(entity.Id);
+            data = await _repository.FindAsync(entity.Id);
             data.MapFrom(entity);
-            return await ResultAsync(() => _tenantRepository.UpdateAsync(data));
+            return await ResultAsync(() => _repository.UpdateAsync(data));
         }
 
         /// <summary>
@@ -132,17 +143,58 @@ namespace Sys.Domain
         public async Task<BaseErrType> DeleteAsync(IEnumerable<Guid> ids)
         {
             if (ids.Count() < 1) return BaseErrType.DataEmpty;
-            var data = await _tenantRepository.GetListAsync(ids);
+            var data = await _repository.GetListAsync(ids);
             if (data.Count() < 1) return BaseErrType.DataEmpty;
 
             try
             {
-                return await ResultAsync(() => _tenantRepository.DeleteRangeAsync(data));
+                return await ResultAsync(() => _repository.DeleteRangeAsync(data));
             }
             catch
             {
                 return BaseErrType.NotAllow;
             }
+        }
+
+        /// <summary>
+        /// 上传Logo
+        /// </summary>
+        /// <param name="id">项目id</param>
+        /// <param name="filename">文件名称</param>
+        /// <param name="file">数据流</param>
+        /// <returns></returns>
+        public async Task<IUploadResult> UploadLogoAsync(Guid id, string filename, Stream file)
+        {
+            var maxSize = 500 * 1024;
+            var extension = Path.GetExtension(filename);
+
+            var result = new UploadResult();
+            var data = await _repository.FindAsync(id);
+            if (data == null)
+                return result;
+
+            if (new ValidateImageType().Validate(filename, file))
+            {
+                var newfileName = id.ToString() + extension;
+                var uploadPath = AppDomain.CurrentDomain.BaseDirectory + UPLOAD_PATH;
+                var virtualPath = VIRTUAL_PATH;
+                var host = _httpContextAccessor.HttpContext.Request.Scheme+ "://" + _httpContextAccessor.HttpContext.Request.Host.Value;
+
+                result = await _uploader.WriteAsync(file, uploadPath, newfileName, maxSize) as UploadResult;
+                // 设置返回虚拟路径
+                if (result.State == UploadEnum.Success)
+                {
+                    result.Url = host + Path.Combine(virtualPath, newfileName);
+                    data.LogoUrl = result.Url;
+                    await _repository.UpdateAsync(data);
+                    return result;
+                }
+            }
+            else
+            {
+                result.State = UploadEnum.TypeError;
+            }
+            return result;
         }
         #endregion
 
@@ -190,7 +242,7 @@ namespace Sys.Domain
         {
             if (!forms.Any())
                 return BaseErrType.DataEmpty;
-            var data = await _tenantRepository.FindAsync(id);
+            var data = await _repository.FindAsync(id);
             if (data == null)
                 return BaseErrType.DataNotFound;
 
@@ -199,20 +251,21 @@ namespace Sys.Domain
             var permissions = _mapper.Map<IEnumerable<SysMenuPermissionForm>, IEnumerable<SysPermission>>(forms);
             var ids = permissions.Select(s => new { s.Id, s.SysMenuId }).ToList();
             var mids = ids.Select(s => s.SysMenuId).ToList();
-            var permMenus = FindAllMenus(mids, menus);
+            var permMenus = FindAllMenus(mids, menus).DistinctBy(d => d.Id);
             mids = permMenus.Select(s => s.Id).ToList();
             var perms = await _permRepository.GetListByMenuAsync(mids);
             perms = permissions.Union(perms).DistinctBy(w => w.Id).ToList();
 
+            var users = await _userRepository.GetListDefaultByTenantAsync(id);
             var tenantPerms = await _contactRepository.GetListByTenantAsync(id);
             var userPerms = await _userContactRepository.GetListByTenantAsync(id);
 
             var addUserList = new List<SysUserPermContact>();
             var addList = perms.Select(s => new SysTenantPermContact() { SysTenantId = id, SysPermissionId = s.Id }).ToList();
 
-            userPerms.GroupBy(g => g.SysUserId).ForEach(e =>
+            users.ForEach(e =>
             {
-                var list = perms.Select(s => new SysUserPermContact() { SysUserId = e.Key, SysPermissionId = s.Id }).ToList();
+                var list = perms.Select(s => new SysUserPermContact() { SysUserId = e.Id, SysPermissionId = s.Id }).ToList();
                 addUserList.AddRange(list);
             });
             using (var tran = new UnitOfWork().BeginTransaction())

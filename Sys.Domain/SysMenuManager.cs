@@ -254,20 +254,21 @@ namespace Sys.Domain
         /// <returns>结果</returns>
         public async Task<BaseErrType> SortAsync(Guid id, int sortNumber)
         {
-            var item = await _repository.FindAsync(id);
-            if (item == null)
-                return BaseErrType.DataNotFound;
-            var data = await _repository.GetListAsync(item.ParentId, string.Empty);
-            if (!data.Any())
-                return BaseErrType.DataNotFound;
+            var data = await _repository.FindAsync(id);
+            if (data == null)
+                return BaseErrType.DataNotMatch;
+            var items = await _repository.GetListAsync(w => w.ParentId == data.ParentId);
+            if (!items.Any())
+                return BaseErrType.DataEmpty;
 
-            var total = data.Count();
-
+            var total = items.Count();
+            items = items.OrderBy(o => o.SortNumber).ToList();
             var dic = new Dictionary<SysMenu, int>();
             for (var i = 0; i < total; i++)
             {
-                dic.Add(data.ElementAt(i), i);
+                dic.Add(items.ElementAt(i), i);
             }
+
             var index = dic.First(w => w.Key.Id == id).Value;
             foreach (var kv in dic)
             {
@@ -287,12 +288,12 @@ namespace Sys.Domain
                 }
             };
 
-            data.ForEach(e =>
+            items.ForEach(e =>
             {
                 e.SortNumber = dic[e];
             });
 
-            return await ResultAsync(() => _repository.UpdateRangeAsync(data));
+            return await ResultAsync(_repository.SaveChangesAsync);
         }
     }
 }

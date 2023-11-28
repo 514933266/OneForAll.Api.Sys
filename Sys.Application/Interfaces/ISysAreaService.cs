@@ -40,16 +40,16 @@ namespace Sys.Application.Interfaces
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">地区</param>
+        /// <param name="form">地区</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(SysAreaForm entity);
+        Task<BaseErrType> AddAsync(SysAreaForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">地区</param>
+        /// <param name="form">地区</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysAreaForm entity);
+        Task<BaseErrType> UpdateAsync(SysAreaForm form);
 
         /// <summary>
         /// 删除

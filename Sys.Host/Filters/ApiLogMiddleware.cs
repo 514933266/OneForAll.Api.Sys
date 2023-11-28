@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sys.Host.Models;
 
 namespace Sys.Host.Filters
 {
@@ -22,11 +23,13 @@ namespace Sys.Host.Filters
         private readonly ISysApiLogHttpService _httpService;
 
         private Stopwatch _stopWatch;
+        private readonly AuthConfig _authConfig;
         private readonly RequestDelegate _next;
 
-        public ApiLogMiddleware(RequestDelegate request, ISysApiLogHttpService httpService)
+        public ApiLogMiddleware(RequestDelegate request, AuthConfig authConfig, ISysApiLogHttpService httpService)
         {
             _next = request;
+            _authConfig = authConfig;
             _httpService = httpService;
             _stopWatch = new Stopwatch();
         }
@@ -39,13 +42,13 @@ namespace Sys.Host.Filters
             var loginUser = GetLoginUser(context);
             var descriptor = context.GetEndpoint()?.Metadata.GetMetadata<ControllerActionDescriptor>();
 
-            var data = new SysApiLogForm()
+            var data = new SysApiLogRequest()
             {
-                MoudleName = "蜂窝云办公-开发人员功能",
-                MoudleCode = "OneForAll.Sys",
+                MoudleName = _authConfig.ClientName,
+                MoudleCode = _authConfig.ClientCode,
                 CreatorId = loginUser.Id,
                 CreatorName = loginUser.Name,
-                TenantId = loginUser.TenantId,
+                TenantId = loginUser.SysTenantId,
                 Host = request.Host.ToString(),
                 Url = request.Path.ToString(),
                 Method = request.Method.ToUpper(),
@@ -137,7 +140,7 @@ namespace Sys.Host.Filters
             {
                 Id = userId == null ? Guid.Empty : new Guid(userId.Value),
                 Name = name == null ? "" : name?.Value,
-                TenantId = tenantId == null ? Guid.Empty : new Guid(tenantId?.Value),
+                SysTenantId = tenantId == null ? Guid.Empty : new Guid(tenantId?.Value),
                 IsDefault = role == null ? false : role.Value.Equals(UserRoleType.RULER)
             };
         }

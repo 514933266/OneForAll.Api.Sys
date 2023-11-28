@@ -17,7 +17,7 @@ namespace Sys.Host.Controllers
     /// 地区
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Roles = UserRoleType.PUBLIC)]
+    [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysAreasController : BaseController
     {
         private readonly ISysAreaService _areaService;
@@ -32,11 +32,8 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        public async Task<PageList<SysAreaDto>> GetPageAsync(
-            int pageIndex,
-            int pageSize,
-            [FromQuery] string key,
-            [FromQuery] int parentId = -1)
+        [CheckPermission(Action = ConstPermission.VIEW)]
+        public async Task<PageList<SysAreaDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key, [FromQuery] int parentId = -1)
         {
             return await _areaService.GetPageAsync(pageIndex, pageSize, key, parentId);
         }
@@ -65,7 +62,7 @@ namespace Sys.Host.Controllers
         /// 添加
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = UserRoleType.RULER)]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<BaseMessage> AddAsync([FromBody] SysAreaForm entity)
         {
             var msg = new BaseMessage();
@@ -84,7 +81,7 @@ namespace Sys.Host.Controllers
         /// 修改
         /// </summary>
         [HttpPut]
-        [Authorize(Roles = UserRoleType.RULER)]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysAreaForm entity)
         {
 
@@ -107,7 +104,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
-        [Authorize(Roles = UserRoleType.RULER)]
+        [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<int> ids)
         {
             var msg = new BaseMessage();

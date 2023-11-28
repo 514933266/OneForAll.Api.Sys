@@ -54,21 +54,21 @@ namespace Sys.Application
         /// 添加
         /// </summary>
         /// <param name="tenantId">租户id</param>
-        /// <param name="entity">角色</param>
+        /// <param name="form">角色</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(Guid tenantId, SysRoleForm entity)
+        public async Task<BaseErrType> AddAsync(Guid tenantId, SysRoleForm form)
         {
-            return await _roleManager.AddAsync(tenantId, entity);
+            return await _roleManager.AddAsync(tenantId, form);
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">角色</param>
+        /// <param name="form">角色</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysRoleForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysRoleForm form)
         {
-            return await _roleManager.UpdateAsync(entity);
+            return await _roleManager.UpdateAsync(form);
         }
 
         /// <summary>
