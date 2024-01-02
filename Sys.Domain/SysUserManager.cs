@@ -24,14 +24,18 @@ namespace Sys.Domain
         private readonly IMapper _mapper;
         private readonly ISysUserRepository _userRepository;
         private readonly ISysTenantRepository _tenantRepository;
+        private readonly ISysUsertPermContactRepository _userPermRepository;
+
         public SysUserManager(
             IMapper mapper,
             ISysUserRepository userRepository,
-            ISysTenantRepository tenantRepository)
+            ISysTenantRepository tenantRepository,
+            ISysUsertPermContactRepository userPermRepository)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _tenantRepository = tenantRepository;
+            _userPermRepository = userPermRepository;
         }
 
         /// <summary>
@@ -52,41 +56,53 @@ namespace Sys.Domain
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">用户</param>
+        /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysUserForm entity)
+        public async Task<BaseErrType> AddAsync(SysUserForm form)
         {
-            var data = await _userRepository.GetAsync(entity.UserName);
+            if (form.Password != form.RePassword) return BaseErrType.DataNotMatch;
+            var data = await _userRepository.GetAsync(form.UserName);
             if (data != null) return BaseErrType.DataExist;
-            var tenant = await _tenantRepository.FindAsync(entity.TenantId);
+            var tenant = await _tenantRepository.FindAsync(form.TenantId);
             if (tenant == null) return BaseErrType.DataError;
 
-            data = _mapper.Map<SysUserForm, SysUser>(entity);
-            data.Password = data.UserName.ToMd5();
+
+            data = _mapper.Map<SysUserForm, SysUser>(form);
+            if (data.Password.IsNullOrEmpty())
+                data.Password = data.UserName.ToMd5();
+            if (form.UserName.IsMobile() && form.Mobile.IsNullOrEmpty())
+                form.Mobile = form.UserName;
             return await ResultAsync(() => _userRepository.AddAsync(data));
         }
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">用户</param>
+        /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysUserForm entity)
+        public async Task<BaseErrType> UpdateAsync(SysUserUpdateForm form)
         {
-            var data = await _userRepository.GetAsync(entity.UserName);
-            if (data != null && data.Id != entity.Id)
-                return BaseErrType.DataExist;
-            data = await _userRepository.FindAsync(entity.Id);
-            if (data == null)
-                return BaseErrType.DataNotFound;
-            var tenant = await _tenantRepository.FindAsync(entity.TenantId);
-            if (tenant == null)
-                return BaseErrType.DataError;
+            var data = await _userRepository.GetAsync(form.UserName);
+            if (data != null)
+            {
+                if (data.Id != form.Id)
+                    return BaseErrType.DataExist;
+            }
+            else
+            {
+                data = await _userRepository.FindAsync(form.Id);
+                if (data == null)
+                    return BaseErrType.DataNotFound;
+            }
 
-            data.Name = entity.Name;
-            data.IsDefault = entity.IsDefault;
-            data.Status = entity.Status;
-            return await ResultAsync(() => _userRepository.UpdateAsync(data));
+            if (data.IsDefault && !form.IsDefault)
+            {
+                // 取消默认账号时清空个人权限
+                var perms = await _userPermRepository.GetListAsync(w => w.SysUserId == data.Id);
+                await _userPermRepository.DeleteRangeAsync(perms);
+            }
+            _mapper.Map(form, data);
+            return await ResultAsync(_userRepository.SaveChangesAsync);
         }
 
         /// <summary>

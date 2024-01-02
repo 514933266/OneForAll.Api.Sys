@@ -47,6 +47,18 @@ namespace Sys.Host.Controllers
         }
 
         /// <summary>
+        /// 获取租户列表
+        /// </summary>
+        /// <param name="ids">租户id</param>
+        /// <returns>租户</returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IEnumerable<SysTenantDto>> GetListAsync([FromQuery] IEnumerable<Guid> ids = default)
+        {
+            return await _service.GetListAsync(ids);
+        }
+
+        /// <summary>
         /// 获取分页
         /// </summary>
         /// <param name="pageIndex">页码</param>
@@ -123,6 +135,7 @@ namespace Sys.Host.Controllers
             {
                 case BaseErrType.Success: return msg.Success("删除成功");
                 case BaseErrType.NotAllow: return msg.Fail("该租户存在使用数据，无法删除");
+                case BaseErrType.Overflow: return msg.Fail("每次最多允许删除一条数据");
                 default: return msg.Fail("删除失败");
             }
         }

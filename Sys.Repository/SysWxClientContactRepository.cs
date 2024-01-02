@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 namespace Sys.Repository
 {
     /// <summary>
-    /// 微信客户端
+    /// 微信客户端关联
     /// </summary>
-    public class SysWxClientSettingRepository : Repository<SysWxClientSetting>, ISysWxClientSettingRepository
+    public class SysWxClientContactRepository : Repository<SysWxClientContact>, ISysWxClientContactRepository
     {
-        public SysWxClientSettingRepository(DbContext context)
+        public SysWxClientContactRepository(DbContext context)
             : base(context)
         {
 

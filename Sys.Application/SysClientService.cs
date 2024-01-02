@@ -14,16 +14,16 @@ using System.Threading.Tasks;
 namespace Sys.Application
 {
     /// <summary>
-    /// 微信客户端
+    /// 系统客户端
     /// </summary>
-    public class SysWxClientSettingService : ISysWxClientSettingService
+    public class SysClientService : ISysClientService
     {
         private readonly IMapper _mapper;
-        private readonly ISysWxClientSettingManager _manager;
+        private readonly ISysClientManager _manager;
 
-        public SysWxClientSettingService(
+        public SysClientService(
             IMapper mapper,
-            ISysWxClientSettingManager manager)
+            ISysClientManager manager)
         {
             _mapper = mapper;
             _manager = manager;
@@ -33,10 +33,10 @@ namespace Sys.Application
         /// 获取列表
         /// </summary>
         /// <returns>列表</returns>
-        public async Task<IEnumerable<SysWxClientSettingDto>> GetListAsync()
+        public async Task<IEnumerable<SysClientDto>> GetListAsync()
         {
             var data = await _manager.GetListAsync();
-            return _mapper.Map<IEnumerable<SysWxClientSetting>, IEnumerable<SysWxClientSettingDto>>(data);
+            return _mapper.Map<IEnumerable<SysClient>, IEnumerable<SysClientDto>>(data);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Sys.Application
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysWxClientSettingForm form)
+        public async Task<BaseErrType> AddAsync(SysClientForm form)
         {
             return await _manager.AddAsync(form);
         }
@@ -54,7 +54,7 @@ namespace Sys.Application
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysWxClientSettingForm form)
+        public async Task<BaseErrType> UpdateAsync(SysClientForm form)
         {
             return await _manager.UpdateAsync(form);
         }
@@ -70,3 +70,4 @@ namespace Sys.Application
         }
     }
 }
+

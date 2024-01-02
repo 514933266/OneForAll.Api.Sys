@@ -22,7 +22,5 @@ namespace Sys.Domain.AggregateRoots
         /// </summary>
         [Required]
         public Guid SysUserId { get; set; }
-        public virtual SysRole SysRole { get; set; }
-        public virtual SysUser SysUser { get; set; }
     }
 }

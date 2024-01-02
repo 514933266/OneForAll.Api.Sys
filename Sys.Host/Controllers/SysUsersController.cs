@@ -20,11 +20,10 @@ namespace Sys.Host.Controllers
     [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysUsersController : BaseController
     {
-        private readonly ISysUserService _userService;
-        public SysUsersController(
-            ISysUserService userService)
+        private readonly ISysUserService _service;
+        public SysUsersController(ISysUserService userService)
         {
-            _userService = userService;
+            _service = userService;
         }
 
         /// <summary>
@@ -39,20 +38,45 @@ namespace Sys.Host.Controllers
         [CheckPermission(Action = ConstPermission.VIEW)]
         public async Task<PageList<SysUserDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
-            return await _userService.GetPageAsync(pageIndex, pageSize, key);
+            return await _service.GetPageAsync(pageIndex, pageSize, key);
+        }
+
+        /// <summary>
+        /// 获取列表
+        /// </summary>
+        /// <param name="ids">关键字</param>
+        /// <returns>用户列表</returns>
+        [HttpGet]
+        public async Task<IEnumerable<SysUserDto>> GetListAsync([FromQuery] IEnumerable<Guid> ids)
+        {
+            return await _service.GetListAsync(ids);
+        }
+
+        /// <summary>
+        /// 根据电话获取登录用户
+        /// </summary>
+        /// <param name="mobile">手机号码</param>
+        /// <param name="tenantId">机构id</param>
+        /// <returns>用户列表</returns>
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("{mobile}")]
+        public async Task<SysUserDto> GetByMobileAsync(string mobile, [FromQuery] Guid tenantId)
+        {
+            return await _service.GetByMobileAsync(tenantId, mobile);
         }
 
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">表单</param>
+        /// <param name="form">表单</param>
         /// <returns>结果</returns>
         [HttpPost]
         [CheckPermission]
-        public async Task<BaseMessage> AddAsync([FromBody] SysUserForm entity)
+        public async Task<BaseMessage> AddAsync([FromBody] SysUserForm form)
         {
             var msg = new BaseMessage();
-            msg.ErrType = await _userService.AddAsync(entity);
+            msg.ErrType = await _service.AddAsync(form);
 
             switch (msg.ErrType)
             {
@@ -67,14 +91,14 @@ namespace Sys.Host.Controllers
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">表单</param>
+        /// <param name="form">表单</param>
         /// <returns>结果</returns>
         [HttpPut]
         [CheckPermission]
-        public async Task<BaseMessage> UpdateAsync([FromBody] SysUserForm entity)
+        public async Task<BaseMessage> UpdateAsync([FromBody] SysUserUpdateForm form)
         {
             var msg = new BaseMessage();
-            msg.ErrType = await _userService.UpdateAsync(entity);
+            msg.ErrType = await _service.UpdateAsync(form);
 
             switch (msg.ErrType)
             {
@@ -96,7 +120,7 @@ namespace Sys.Host.Controllers
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();
-            msg.ErrType = await _userService.DeleteAsync(ids);
+            msg.ErrType = await _service.DeleteAsync(ids);
 
             switch (msg.ErrType)
             {

@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sys.Application.Dtos
+namespace Sys.Domain.Models
 {
     /// <summary>
     /// 微信客户端
     /// </summary>
-    public class SysWxClientSettingDto
+    public class SysWxClientgForm
     {
         /// <summary>
         /// 实体id
@@ -20,26 +20,22 @@ namespace Sys.Application.Dtos
         /// <summary>
         /// 系统客户端id
         /// </summary>
-        public string ClientId { get; set; }
-
-        /// <summary>
-        /// 系统客户端密码
-        /// </summary>
-        public string ClientSecret { get; set; }
-
-        /// <summary>
-        /// 系统客户端名称
-        /// </summary>
-        public string ClientName { get; set; }
+        [Required]
+        [StringLength(100)]
+        public Guid ClientId { get; set; }
 
         /// <summary>
         /// 微信客户端id
         /// </summary>
+        [Required]
+        [StringLength(100)]
         public string AppId { get; set; }
 
         /// <summary>
         /// 微信客户端密码
         /// </summary>
+        [Required]
+        [StringLength(100)]
         public string AppSecret { get; set; }
     }
 }

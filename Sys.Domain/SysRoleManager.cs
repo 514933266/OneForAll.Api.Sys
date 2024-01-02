@@ -41,7 +41,7 @@ namespace Sys.Domain
             if (pageIndex < 1)  pageIndex = 1;
             if (pageSize < 1)   pageSize = 10;
             if (pageSize > 100) pageSize = 100;
-            return await _roleRepository.GetPageWithContactsAsync(pageIndex, pageSize, key);
+            return await _roleRepository.GetPageAsync(pageIndex, pageSize, key);
         }
 
         /// <summary>

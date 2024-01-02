@@ -1,16 +1,19 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sys.Domain.Enums;
 
 namespace Sys.Domain.Models
 {
     /// <summary>
-    /// 微信客户端
+    /// 系统客户端
     /// </summary>
-    public class SysWxClientSettingForm
+    public class SysClientForm
     {
         /// <summary>
         /// 实体id
@@ -39,17 +42,20 @@ namespace Sys.Domain.Models
         public string ClientName { get; set; }
 
         /// <summary>
-        /// 微信客户端id
+        /// 允许自动创建账号
         /// </summary>
         [Required]
-        [StringLength(100)]
-        public string AppId { get; set; }
+        public bool AutoCreateAccount { get; set; }
 
         /// <summary>
-        /// 微信客户端密码
+        /// 类型
         /// </summary>
-        [Required]
-        [StringLength(100)]
-        public string AppSecret { get; set; }
+        public SysClientTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 角色
+        /// </summary>
+        [StringLength(20)]
+        public string Role { get; set; }
     }
 }

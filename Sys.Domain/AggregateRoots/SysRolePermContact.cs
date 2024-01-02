@@ -22,9 +22,5 @@ namespace Sys.Domain.AggregateRoots
         /// </summary>
         [Required]
         public Guid SysPermissionId { get; set; }
-
-        public virtual SysPermission SysPermission { get; set; }
-
-        public virtual SysRole SysRole { get; set; }
     }
 }

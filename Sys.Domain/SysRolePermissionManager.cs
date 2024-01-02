@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OneForAll.Core.Extension;
+using OneForAll.EFCore;
 
 namespace Sys.Domain
 {
@@ -20,12 +22,16 @@ namespace Sys.Domain
     {
         private readonly ISysRoleRepository _roleRepository;
         private readonly ISysPermissionRepository _permRepository;
+        private readonly ISysRolePermContactRepository _rolePermRepository;
+
         public SysRolePermissionManager(
             ISysRoleRepository roleRepository,
-            ISysPermissionRepository permRepository)
+            ISysPermissionRepository permRepository,
+            ISysRolePermContactRepository rolePermRepository)
         {
             _roleRepository = roleRepository;
             _permRepository = permRepository;
+            _rolePermRepository = rolePermRepository;
         }
 
         /// <summary>
@@ -35,14 +41,7 @@ namespace Sys.Domain
         /// <returns>权限列表</returns>
         public async Task<IEnumerable<SysPermission>> GetListAsync(Guid roleId)
         {
-            var role = await _roleRepository.GetWithPermsAsync(roleId);
-            if (role != null)
-            {
-                return role
-                    .SysRolePermContacts
-                    .Select(s => s.SysPermission);
-            }
-            return new List<SysPermission>();
+            return await _rolePermRepository.GetListPermissionAsync(roleId);
         }
 
         /// <summary>
@@ -53,13 +52,29 @@ namespace Sys.Domain
         /// <returns>权限列表</returns>
         public async Task<BaseErrType> AddAsync(Guid roleId, IEnumerable<Guid> permIds)
         {
-            var data = await _roleRepository.GetWithPermsAsync(roleId);
-            if (data != null)
+            var data = await _roleRepository.FindAsync(roleId);
+            if (data == null)
+                return BaseErrType.DataNotFound;
+
+            var addList = new List<SysRolePermContact>();
+            var permissions = await _permRepository.GetListAsync(permIds);
+            var exists = await _rolePermRepository.GetListAsync(w => w.SysRoleId == data.Id);
+
+            permissions.ForEach(perm =>
             {
-                var permissions = await _permRepository.GetListAsync(permIds);
-                data.SysRolePermContacts.Clear();
-                data.AddPermission(permissions);
-                return await ResultAsync(() => _roleRepository.UpdateAsync(data));
+                addList.Add(new SysRolePermContact()
+                {
+                    SysPermissionId = perm.Id,
+                    SysRoleId = roleId,
+                });
+            });
+
+            using (var tran = new UnitOfWork().BeginTransaction())
+            {
+                if (exists.Any())
+                    await _rolePermRepository.DeleteRangeAsync(exists, tran);
+                if (addList.Any())
+                    await _rolePermRepository.AddRangeAsync(addList, tran);
             }
             return BaseErrType.DataNotFound;
         }

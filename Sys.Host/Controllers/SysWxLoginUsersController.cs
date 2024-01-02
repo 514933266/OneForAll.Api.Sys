@@ -17,7 +17,6 @@ namespace Sys.Host.Controllers
     /// 微信登录用户
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(Roles = UserRoleType.ADMIN)]
     public class SysWxLoginUsersController : BaseController
     {
         private readonly ISysWxLoginUserService _userService;

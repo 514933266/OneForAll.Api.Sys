@@ -39,7 +39,7 @@ namespace Sys.Repository
             if (!appId.IsNullOrEmpty())
                 predicate = predicate.And(w => w.AppId == appId);
 
-            var clientDbSet = Context.Set<SysWxClientSetting>();
+            var clientDbSet = Context.Set<SysWxClient>();
             var total = await DbSet.CountAsync(predicate);
 
             var query = (from setting in DbSet.Where(predicate)
@@ -52,8 +52,7 @@ namespace Sys.Repository
                              MsgType = setting.MsgType,
                              ReplyType = setting.ReplyType,
                              XmlContent = setting.XmlContent,
-                             ContentJson = setting.ContentJson,
-                             ClientName = lfClient.ClientName
+                             ContentJson = setting.ContentJson
                          });
 
             var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();

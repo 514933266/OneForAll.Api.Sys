@@ -34,8 +34,8 @@ namespace Sys.Application
         public async Task<string> UserEventAsync(string appId, string xmlContent)
         {
             var data = SerializationHelper.DeserializeXml<WxgzhEventForm>(xmlContent, Encoding.UTF8);
-            var type = data.MsgType.ToLower();
-            var eventType = data.Event.ToLower();
+            var type = data?.MsgType?.ToLower();
+            var eventType = data?.Event?.ToLower();
             switch (type)
             {
                 case "event":

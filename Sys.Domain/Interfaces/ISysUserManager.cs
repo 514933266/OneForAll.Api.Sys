@@ -26,16 +26,16 @@ namespace Sys.Domain.Interfaces
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">用户</param>
+        /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(SysUserForm entity);
+        Task<BaseErrType> AddAsync(SysUserForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
-        /// <param name="entity">用户</param>
+        /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysUserForm entity);
+        Task<BaseErrType> UpdateAsync(SysUserUpdateForm form);
 
         /// <summary>
         /// 删除

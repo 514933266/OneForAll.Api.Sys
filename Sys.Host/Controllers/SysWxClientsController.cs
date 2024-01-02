@@ -17,11 +17,11 @@ namespace Sys.Host.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [Authorize(Roles = UserRoleType.ADMIN)]
-    public class SysWxClientSettingsController : BaseController
+    public class SysWxClientsController : BaseController
     {
-        private readonly ISysWxClientSettingService _service;
+        private readonly ISysWxClientService _service;
 
-        public SysWxClientSettingsController(ISysWxClientSettingService service)
+        public SysWxClientsController(ISysWxClientService service)
         {
             _service = service;
         }
@@ -32,7 +32,7 @@ namespace Sys.Host.Controllers
         /// <returns>列表</returns>
         [HttpGet]
         [CheckPermission(Action = ConstPermission.VIEW)]
-        public async Task<IEnumerable<SysWxClientSettingDto>> GetPageAsync()
+        public async Task<IEnumerable<SysWxClientDto>> GetPageAsync()
         {
             return await _service.GetListAsync();
         }
@@ -42,7 +42,7 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpPost]
         [CheckPermission]
-        public async Task<BaseMessage> AddAsync([FromBody] SysWxClientSettingForm entity)
+        public async Task<BaseMessage> AddAsync([FromBody] SysWxClientgForm entity)
         {
             var msg = new BaseMessage();
             msg.ErrType = await _service.AddAsync(entity);
@@ -50,7 +50,7 @@ namespace Sys.Host.Controllers
             switch (msg.ErrType)
             {
                 case BaseErrType.Success: return msg.Success("添加成功");
-                case BaseErrType.DataExist: return msg.Fail("已存在相同AppId客户端");
+                case BaseErrType.DataExist: return msg.Fail("AppId已存在");
                 default: return msg.Fail("添加失败");
             }
         }
@@ -60,7 +60,7 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpPut]
         [CheckPermission]
-        public async Task<BaseMessage> UpdateAsync([FromBody] SysWxClientSettingForm entity)
+        public async Task<BaseMessage> UpdateAsync([FromBody] SysWxClientgForm entity)
         {
 
             var msg = new BaseMessage() { Status = false };
@@ -69,6 +69,7 @@ namespace Sys.Host.Controllers
             switch (msg.ErrType)
             {
                 case BaseErrType.Success: return msg.Success("修改成功");
+                case BaseErrType.DataExist: return msg.Fail("AppId已存在");
                 case BaseErrType.DataNotFound: return msg.Fail("数据不存在");
                 default: return msg.Fail("修改失败");
             }

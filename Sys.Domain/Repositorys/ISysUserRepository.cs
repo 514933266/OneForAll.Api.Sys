@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Sys.Domain.Aggregates;
+using System.Linq;
 
 namespace Sys.Domain.Repositorys
 {
@@ -39,11 +40,18 @@ namespace Sys.Domain.Repositorys
         Task<IEnumerable<SysUser>> GetListAsync(IEnumerable<Guid> ids);
 
         /// <summary>
-        /// 查询列表（默认账号）
+        /// 查询默认账号列表
         /// </summary>
-        /// <param name="tenantId">用户id</param>
+        /// <param name="tenantId">租户id</param>
         /// <returns>用户</returns>
         Task<IEnumerable<SysUser>> GetListDefaultByTenantAsync(Guid tenantId);
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <param name="tenantId">租户id</param>
+        /// <returns>用户</returns>
+        Task<IEnumerable<SysUser>> GetListByTenantAsync(Guid tenantId);
 
         /// <summary>
         /// 查询列表

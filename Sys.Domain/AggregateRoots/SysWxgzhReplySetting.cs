@@ -250,5 +250,34 @@ namespace Sys.Domain.AggregateRoots
             }
             return result.FromJson<List<T>>();
         }
+
+        /// <summary>
+        /// 替换MsgType = Text 的响应的内容值
+        /// </summary>
+        /// <param name="value">回复内容</param>
+        /// <returns></returns>
+        public void ReplaceReplyTextContentJsonValue(string value)
+        {
+            ReplaceReplyContentJsonValue("content", value);
+        }
+
+        /// <summary>
+        /// 替换MsgType = Text 的响应的内容值
+        /// </summary>
+        /// <param name="name">字段名</param>
+        /// <param name="value">字段值</param>
+        /// <returns></returns>
+        public void ReplaceReplyContentJsonValue(string name, string value)
+        {
+            var contents = ContentJson.FromJson<IEnumerable<SysWxgzhReplySettingContentVo>>();
+            contents.ForEach(e =>
+            {
+                if (e.Name == name)
+                {
+                    e.Value = value;
+                }
+            });
+            ContentJson = contents.ToJson();
+        }
     }
 }

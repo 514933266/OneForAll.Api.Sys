@@ -19,8 +19,8 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysWxgzhSubscribeUserRepository _repository;
-        private readonly ISysWxClientSettingRepository _clientRepository;
-        public SysWxgzhNotifyUserService(IMapper mapper, ISysWxgzhSubscribeUserRepository repository, ISysWxClientSettingRepository clientRepository)
+        private readonly ISysWxClientRepository _clientRepository;
+        public SysWxgzhNotifyUserService(IMapper mapper, ISysWxgzhSubscribeUserRepository repository, ISysWxClientRepository clientRepository)
         {
             _mapper = mapper;
             _repository = repository;
@@ -36,7 +36,7 @@ namespace Sys.Application
         public async Task<SysWxgzhNotifyUserDto> GetAsync(Guid userId, string clientId)
         {
             var result = new SysWxgzhNotifyUserDto();
-            var client = await _clientRepository.GetAsync(w => w.ClientId == clientId);
+            var client = await _clientRepository.GetByClientIdAsync(clientId);
             if (client != null)
             {
                 var data = await _repository.GetAsync(w => w.SysUserId == userId && w.AppId == client.AppId && !w.IsUnSubscribed);

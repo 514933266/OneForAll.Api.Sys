@@ -23,7 +23,7 @@ namespace Sys.Host.Profiles
             CreateMap<SysUser, SysWxLoginUserDto>();
             CreateMap<SysUserForm, SysUser>()
                 .ForMember(t => t.SysTenantId, a => a.MapFrom(s => s.TenantId));
-
+            CreateMap<SysUserUpdateForm, SysUser>();
         }
     }
 }

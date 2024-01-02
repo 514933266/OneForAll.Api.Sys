@@ -20,12 +20,18 @@ namespace Sys.Domain
     {
         private readonly ISysRoleRepository _roleRepository;
         private readonly ISysUserRepository _userRepository;
+        private readonly ISysRoleUserContactRepository _roleUserRepository;
+        private readonly ISysRolePermContactRepository _rolePermRepository;
         public SysRoleMemberManager(
             ISysRoleRepository roleRepository,
-            ISysUserRepository userRepository)
+            ISysUserRepository userRepository,
+            ISysRoleUserContactRepository roleUserRepository,
+            ISysRolePermContactRepository rolePermRepository)
         {
             _roleRepository = roleRepository;
             _userRepository = userRepository;
+            _roleUserRepository = roleUserRepository;
+            _rolePermRepository = rolePermRepository;
         }
 
         /// <summary>
@@ -35,12 +41,7 @@ namespace Sys.Domain
         /// <returns>权限列表</returns>
         public async Task<IEnumerable<SysUser>> GetListAsync(Guid roleId)
         {
-            var data = await _roleRepository.GetWithMembersAsync(roleId);
-            if (data != null)
-            {
-                return data.SysRoleUserContacts.Select(s => s.SysUser);
-            }
-            return new List<SysUser>();
+            return await _roleUserRepository.GetListUserAsync(roleId);
         }
 
         /// <summary>
@@ -51,14 +52,20 @@ namespace Sys.Domain
         /// <returns>用户列表</returns>
         public async Task<IEnumerable<SysUser>> GetListUnJoinedAsync(Guid roleId, string key)
         {
-            var data = await _roleRepository.GetWithMembersAsync(roleId);
-            if (data != null)
+            var data = await _roleRepository.FindAsync(roleId);
+            if (data == null)
+                return Enumerable.Empty<SysUser>();
+
+            var exists = await _roleUserRepository.GetListAsync(w => w.SysRoleId == data.Id);
+            var existsIds = exists.Select(s => s.SysUserId);
+            if (existsIds.Any())
             {
-                var users = await _userRepository.GetListAsync();
-                var existsIds = data.SysRoleUserContacts.Select(s => s.SysUserId);
-                return users.Where(w => w.Id.NotIn(existsIds));
+                return await _userRepository.GetListAsync(w => !existsIds.Contains(w.Id));
             }
-            return new List<SysUser>();
+            else
+            {
+                return await _userRepository.GetListAsync();
+            }
         }
 
         /// <summary>
@@ -69,12 +76,33 @@ namespace Sys.Domain
         /// <returns>权限列表</returns>
         public async Task<BaseErrType> AddAsync(Guid roleId, IEnumerable<Guid> userIds)
         {
-            var data = await _roleRepository.GetWithMembersAsync(roleId);
-            if (data == null) return BaseErrType.DataNotFound;
+            var data = await _roleRepository.FindAsync(roleId);
+            if (data == null)
+                return BaseErrType.DataNotFound;
 
+            var items = new List<SysRoleUserContact>();
             var users = await _userRepository.GetListAsync(userIds);
-            data.AddMember(users);
-            return await ResultAsync(() => _roleRepository.UpdateAsync(data));
+            var exists = await _roleUserRepository.GetListAsync(w => w.SysRoleId == data.Id);
+            users.ForEach(user =>
+            {
+                var item = exists.FirstOrDefault(w => w.SysUserId == user.Id);
+                if (item == null)
+                {
+                    items.Add(new SysRoleUserContact()
+                    {
+                        SysRoleId = data.Id,
+                        SysUserId = user.Id
+                    });
+                }
+            });
+            if (items.Any())
+            {
+                return await ResultAsync(() => _roleUserRepository.AddRangeAsync(items));
+            }
+            else
+            {
+                return BaseErrType.DataEmpty;
+            }
         }
 
         /// <summary>
@@ -85,11 +113,18 @@ namespace Sys.Domain
         /// <returns>结果</returns>
         public async Task<BaseErrType> RemoveAsync(Guid roleId, IEnumerable<Guid> userIds)
         {
-            var data = await _roleRepository.GetWithMembersAsync(roleId);
+            var data = await _roleRepository.FindAsync(roleId);
             if (data == null) return BaseErrType.DataNotFound;
 
-            data.RemoveMember(userIds);
-            return await ResultAsync(() => _roleRepository.UpdateAsync(data));
+            var users = await _roleUserRepository.GetListAsync(w => w.SysRoleId == data.Id);
+            if (users.Any())
+            {
+                return await ResultAsync(() => _roleUserRepository.DeleteRangeAsync(users));
+            }
+            else
+            {
+                return BaseErrType.DataEmpty;
+            }
         }
     }
 }

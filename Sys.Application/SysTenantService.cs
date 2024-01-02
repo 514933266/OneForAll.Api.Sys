@@ -29,12 +29,15 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysTenantManager _manager;
+        private readonly ISysTenantRepository _repository;
         public SysTenantService(
             IMapper mapper,
-            ISysTenantManager manager)
+            ISysTenantManager manager,
+            ISysTenantRepository repository)
         {
             _mapper = mapper;
             _manager = manager;
+            _repository = repository;
         }
 
         #region 租户
@@ -48,6 +51,19 @@ namespace Sys.Application
         {
             var data = await _manager.GetAsync(id);
             return _mapper.Map<SysTenant, SysTenantDto>(data);
+        }
+
+        /// <summary>
+        /// 获取租户列表
+        /// </summary>
+        /// <param name="ids">租户id</param>
+        /// <returns>租户</returns>
+        public async Task<IEnumerable<SysTenantDto>> GetListAsync(IEnumerable<Guid> ids)
+        {
+            if (!ids.Any())
+                return Enumerable.Empty<SysTenantDto>();
+            var data = await _repository.GetListAsync(w => ids.Contains(w.Id));
+            return _mapper.Map<IEnumerable<SysTenant>, IEnumerable<SysTenantDto>>(data);
         }
 
         /// <summary>

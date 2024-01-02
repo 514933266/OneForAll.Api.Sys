@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using Sys.Domain.AggregateRoots;
-using Sys.Domain.Aggregates;
 using Sys.Domain.Interfaces;
 using Sys.Domain.Models;
 using Sys.Domain.Repositorys;
@@ -15,16 +14,16 @@ using System.Threading.Tasks;
 namespace Sys.Domain
 {
     /// <summary>
-    /// 微信客户端
+    /// 系统客户端
     /// </summary>
-    public class SysWxClientSettingManager : SysBaseManager, ISysWxClientSettingManager
+    public class SysClientManager : SysBaseManager, ISysClientManager
     {
-        private readonly ISysWxClientSettingRepository _repository;
+        private readonly ISysClientRepository _repository;
 
-        public SysWxClientSettingManager(
+        public SysClientManager(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            ISysWxClientSettingRepository repository) : base(mapper, httpContextAccessor)
+            ISysClientRepository repository) : base(mapper, httpContextAccessor)
         {
             _repository = repository;
         }
@@ -33,7 +32,7 @@ namespace Sys.Domain
         /// 获取列表
         /// </summary>
         /// <returns>列表</returns>
-        public async Task<IEnumerable<SysWxClientSetting>> GetListAsync()
+        public async Task<IEnumerable<SysClient>> GetListAsync()
         {
             return await _repository.GetListAsync();
         }
@@ -43,13 +42,13 @@ namespace Sys.Domain
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysWxClientSettingForm form)
+        public async Task<BaseErrType> AddAsync(SysClientForm form)
         {
-            var exists = await _repository.CountAsync(w => w.AppId == form.AppId);
+            var exists = await _repository.CountAsync(w => w.ClientId == form.ClientId);
             if (exists > 0)
                 return BaseErrType.DataExist;
 
-            var data = _mapper.Map<SysWxClientSettingForm, SysWxClientSetting>(form);
+            var data = _mapper.Map<SysClientForm, SysClient>(form);
             return await ResultAsync(() => _repository.AddAsync(data));
         }
 
@@ -58,13 +57,16 @@ namespace Sys.Domain
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysWxClientSettingForm form)
+        public async Task<BaseErrType> UpdateAsync(SysClientForm form)
         {
-            var exists = await _repository.GetAsync(w => w.AppId == form.AppId);
-            if (exists == null)
+            var exists = await _repository.CountAsync(w => w.ClientId == form.ClientId && w.Id != form.Id);
+            if (exists > 0)
+                return BaseErrType.DataExist;
+            var data = await _repository.FindAsync(form.Id);
+            if (data == null)
                 return BaseErrType.DataNotFound;
 
-            _mapper.Map(exists, form);
+            _mapper.Map(form, data);
             return await ResultAsync(_repository.SaveChangesAsync);
         }
 
@@ -85,3 +87,4 @@ namespace Sys.Domain
         }
     }
 }
+

@@ -26,6 +26,13 @@ namespace Sys.Application.Interfaces
         Task<SysTenantDto> GetAsync(Guid id);
 
         /// <summary>
+        /// 获取租户列表
+        /// </summary>
+        /// <param name="ids">租户id</param>
+        /// <returns>租户</returns>
+        Task<IEnumerable<SysTenantDto>> GetListAsync(IEnumerable<Guid> ids);
+
+        /// <summary>
         /// 获取分页
         /// </summary>
         /// <param name="pageIndex">页码</param>

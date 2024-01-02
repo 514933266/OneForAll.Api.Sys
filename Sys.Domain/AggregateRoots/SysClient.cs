@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Sys.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,9 +11,9 @@ using System.Threading.Tasks;
 namespace Sys.Domain.AggregateRoots
 {
     /// <summary>
-    /// 微信客户端
+    /// 客户端
     /// </summary>
-    public class SysWxClientSetting
+    public class SysClient
     {
         /// <summary>
         /// 实体id
@@ -43,36 +44,29 @@ namespace Sys.Domain.AggregateRoots
         public string ClientName { get; set; }
 
         /// <summary>
-        /// 微信客户端id
+        /// 允许自动创建账号
         /// </summary>
         [Required]
-        [StringLength(100)]
-        public string AppId { get; set; }
+        public bool AutoCreateAccount { get; set; }
 
         /// <summary>
-        /// 微信客户端密码
+        /// 类型
         /// </summary>
         [Required]
-        [StringLength(100)]
-        public string AppSecret { get; set; }
+        public SysClientTypeEnum Type { get; set; } = SysClientTypeEnum.Web;
 
         /// <summary>
-        /// 微信的accessToken
+        /// 角色
         /// </summary>
         [Required]
-        [StringLength(200)]
-        public string AccessToken { get; set; } = "";
+        [StringLength(20)]
+        public string Role { get; set; } = "admin";
 
         /// <summary>
-        /// 访问凭证过期时间
+        /// 创建时间
         /// </summary>
         [Required]
-        public int AccessTokenExpiresIn { get; set; }
-
-        /// <summary>
-        /// 访问凭证获取时间
-        /// </summary>
         [Column(TypeName = "datetime")]
-        public DateTime? AccessTokenCreateTime { get; set; }
+        public DateTime CreateTime { get; set; } = DateTime.Now;
     }
 }

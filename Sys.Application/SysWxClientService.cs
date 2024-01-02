@@ -15,36 +15,29 @@ using System.Threading.Tasks;
 namespace Sys.Application
 {
     /// <summary>
-    /// 微信公众号消息回复
+    /// 微信客户端
     /// </summary>
-    public class SysWxgzhReplySettingService : ISysWxgzhReplySettingService
+    public class SysWxClientService : ISysWxClientService
     {
         private readonly IMapper _mapper;
-        private readonly ISysWxgzhReplySettingManager _manager;
-        private readonly ISysWxClientManager _clientManager;
+        private readonly ISysWxClientManager _manager;
 
-        public SysWxgzhReplySettingService(
+        public SysWxClientService(
             IMapper mapper,
-            ISysWxgzhReplySettingManager manager,
-            ISysWxClientManager clientManager)
+            ISysWxClientManager manager)
         {
             _mapper = mapper;
             _manager = manager;
-            _clientManager = clientManager;
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// 获取列表
         /// </summary>
-        /// <param name="pageIndex">页码</param>
-        /// <param name="pageSize">页数</param>
-        /// <param name="appId">所属微信应用id</param>
-        /// <returns>分页列表</returns>
-        public async Task<PageList<SysWxgzhReplySettingDto>> GetPageAsync(int pageIndex, int pageSize, string appId)
+        /// <returns>列表</returns>
+        public async Task<IEnumerable<SysWxClientDto>> GetListAsync()
         {
-            var data = await _manager.GetPageAsync(pageIndex, pageSize, appId);
-            var items = _mapper.Map<IEnumerable<SysWxgzhReplySettingAggr>, IEnumerable<SysWxgzhReplySettingDto>>(data.Items);
-            return new PageList<SysWxgzhReplySettingDto>(data.Total, data.PageSize, data.PageIndex, items);
+            var data = await _manager.GetListAsync();
+            return _mapper.Map<IEnumerable<SysWxClientAggr>, IEnumerable<SysWxClientDto>>(data);
         }
 
         /// <summary>
@@ -52,7 +45,7 @@ namespace Sys.Application
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysWxgzhReplySettingForm form)
+        public async Task<BaseErrType> AddAsync(SysWxClientgForm form)
         {
             return await _manager.AddAsync(form);
         }
@@ -62,7 +55,7 @@ namespace Sys.Application
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysWxgzhReplySettingForm form)
+        public async Task<BaseErrType> UpdateAsync(SysWxClientgForm form)
         {
             return await _manager.UpdateAsync(form);
         }
@@ -70,7 +63,7 @@ namespace Sys.Application
         /// <summary>
         /// 删除
         /// </summary>
-        /// <param name="ids">权限id</param>
+        /// <param name="ids">实体id</param>
         /// <returns>结果</returns>
         public async Task<BaseErrType> DeleteAsync(IEnumerable<Guid> ids)
         {

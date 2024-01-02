@@ -22,6 +22,8 @@ namespace Sys.Host
         public virtual DbSet<SysPermission> SysPermission { get; set; }
         public virtual DbSet<SysTenantPermContact> SysTenantPermContact { get; set; }
         public virtual DbSet<SysUserPermContact> SysUserPermContact { get; set; }
+        public virtual DbSet<SysRolePermContact> SysRolePermContact { get; set; }
+        public virtual DbSet<SysRoleUserContact> SysRoleUserContact { get; set; }
 
         #endregion
 
@@ -29,7 +31,9 @@ namespace Sys.Host
 
         public virtual DbSet<SysTenant> SysTenant { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
-
+        public virtual DbSet<SysClient> SysClient { get; set; }
+        public virtual DbSet<SysRole> SysRole { get; set; }
+        
         #endregion
 
         #region 公共数据
@@ -62,42 +66,48 @@ namespace Sys.Host
         public virtual DbSet<SysWechatUser> SysWechatUser { get; set; }
         public virtual DbSet<SysWxgzhSubscribeUser> SysWxgzhSubscribeUser { get; set; }
         public virtual DbSet<SysWxgzhReplySetting> SysWxgzhReplySetting { get; set; }
-        public virtual DbSet<SysWxClientSetting> SysWxClientSetting { get; set; }
-
+        public virtual DbSet<SysWxClient> SysWxClient { get; set; }
+        public virtual DbSet<SysWxClientContact> SysWxClientContact { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region 菜单权限
 
-            modelBuilder.Entity<SysMenu>(entity =>
+            modelBuilder.Entity<SysMenu>(form =>
             {
-                entity.ToTable("Sys_Menu");
-
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                form.ToTable("Sys_Menu");
+                form.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
-            modelBuilder.Entity<SysPermission>(entity =>
+            modelBuilder.Entity<SysPermission>(form =>
             {
-                entity.ToTable("Sys_Permission");
-
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
+                form.ToTable("Sys_Permission");
+                form.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
-            modelBuilder.Entity<SysTenantPermContact>(entity =>
+            modelBuilder.Entity<SysTenantPermContact>(form =>
             {
-                entity.ToTable("Sys_TenantPermContact");
-
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                form.ToTable("Sys_TenantPermContact");
+                form.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
-            modelBuilder.Entity<SysUserPermContact>(entity =>
+            modelBuilder.Entity<SysRolePermContact>(form =>
             {
-                entity.ToTable("Sys_UserPermContact");
+                form.ToTable("Sys_RolePermContact");
+                form.Property(e => e.Id).ValueGeneratedOnAdd();
+            });
 
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<SysRoleUserContact>(form =>
+            {
+                form.ToTable("Sys_RoleUserContact");
+                form.Property(e => e.Id).ValueGeneratedOnAdd();
+            });
 
+            modelBuilder.Entity<SysUserPermContact>(form =>
+            {
+                form.ToTable("Sys_UserPermContact");
+                form.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
             #endregion
@@ -114,6 +124,20 @@ namespace Sys.Host
             modelBuilder.Entity<SysUser>(entity =>
             {
                 entity.ToTable("Sys_User");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<SysClient>(entity =>
+            {
+                entity.ToTable("Sys_Client");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<SysRole>(entity =>
+            {
+                entity.ToTable("Sys_Role");
 
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });
@@ -212,9 +236,16 @@ namespace Sys.Host
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
-            modelBuilder.Entity<SysWxClientSetting>(entity =>
+            modelBuilder.Entity<SysWxClient>(entity =>
             {
-                entity.ToTable("Sys_WxClientSetting");
+                entity.ToTable("Sys_WxClient");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<SysWxClientContact>(entity =>
+            {
+                entity.ToTable("Sys_WxClientContact");
 
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Sys.Application.Dtos
@@ -72,5 +74,10 @@ namespace Sys.Application.Dtos
         /// 创建时间
         /// </summary>
         public DateTime CreateTime { get; set; }
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        public DateTime? UpdateTime { get; set; }
     }
 }

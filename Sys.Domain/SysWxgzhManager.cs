@@ -25,27 +25,33 @@ namespace Sys.Domain
     /// </summary>
     public class SysWxgzhManager : SysBaseManager, ISysWxgzhManager
     {
-        private readonly ISysWechatUserRepository _userRepository;
-        private readonly ISysWxClientSettingRepository _wxClientRepository;
+        private readonly ISysUserRepository _userRepository;
+        private readonly ISysWechatUserRepository _wxuserRepository;
+        private readonly ISysWxClientRepository _wxClientRepository;
         private readonly ISysWxgzhReplySettingRepository _replyRepository;
         private readonly ISysWxgzhSubscribeUserRepository _repository;
 
         private readonly IWxgzhHttpService _wxgzhHttpService;
+        private readonly ISysGlobalExceptionLogHttpService _exHttpService;
 
         public SysWxgzhManager(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            ISysWechatUserRepository userRepository,
+            ISysUserRepository userRepository,
+            ISysWechatUserRepository wxuserRepository,
             ISysWxgzhSubscribeUserRepository repository,
             ISysWxgzhReplySettingRepository replyRepository,
-            ISysWxClientSettingRepository wxClientRepository,
-            IWxgzhHttpService wxgzhHttpService) : base(mapper, httpContextAccessor)
+            ISysWxClientRepository wxClientRepository,
+            IWxgzhHttpService wxgzhHttpService,
+            ISysGlobalExceptionLogHttpService exHttpService) : base(mapper, httpContextAccessor)
         {
             _repository = repository;
             _userRepository = userRepository;
+            _wxuserRepository = wxuserRepository;
             _replyRepository = replyRepository;
             _wxClientRepository = wxClientRepository;
             _wxgzhHttpService = wxgzhHttpService;
+            _exHttpService = exHttpService;
         }
 
         /// <summary>
@@ -62,14 +68,39 @@ namespace Sys.Domain
             if (data.Event.ToLower() == "subscribe")
             {
                 var subscribeType = data.EventKey.IsNullOrEmpty() ? SysWxgzhSubscribeType.Search : SysWxgzhSubscribeType.QRCode;
-                var user = await _userRepository.GetAsync(w => w.OpenId == data.FromUserName);
+                var user = await _wxuserRepository.GetAsync(w => w.OpenId == data.FromUserName);
                 var msg = await _replyRepository.GetAsync(w => w.AppId == appId && w.MsgType == SysWxgzhMsgTypeEnum.Subscribe);
                 if (exists == null)
                 {
+                    var unionId = "";
+                    var sysUserId = Guid.Empty;
+                    if (user != null)
+                    {
+                        // 优先绑定公众号登录账号
+                        unionId = user.UnionId;
+                        sysUserId = user.SysUserId;
+                    }
+                    else
+                    {
+                        // 小程序账号
+                        var client = await _wxClientRepository.GetAsync(w => w.AppId == appId);
+                        if (client != null)
+                        {
+                            var unionRes = await _wxgzhHttpService.GetUnionIdAsync(data.FromUserName, client.AccessToken);
+                            if (unionRes != null)
+                            {
+                                unionId = unionRes.UnionId ?? "";
+                                user = await _wxuserRepository.GetAsync(w => w.UnionId == unionId);
+                                if (user != null)
+                                    sysUserId = user.SysUserId;
+                            }
+                        }
+                    }
                     await _repository.AddAsync(new SysWxgzhSubscribeUser()
                     {
                         AppId = appId,
-                        SysUserId = user?.Id ?? Guid.Empty,
+                        UnionId = unionId,
+                        SysUserId = sysUserId,
                         OpenId = data.FromUserName,
                         IsUnSubscribed = false,
                         SubscribeType = subscribeType
@@ -87,10 +118,7 @@ namespace Sys.Domain
             else
             {
                 if (exists != null)
-                {
-                    exists.IsUnSubscribed = true;
-                    await _repository.SaveChangesAsync();
-                }
+                    await _repository.DeleteAsync(exists);
             }
             return result;
         }
@@ -139,13 +167,67 @@ namespace Sys.Domain
         public async Task<string> TextEventAsync(string appId, string xmlContent)
         {
             var result = "";
-            var data = SerializationHelper.DeserializeXml<WxgzhMenuClickEventForm>(xmlContent, Encoding.UTF8);
-            var msg = await _replyRepository.GetAsync(w => w.AppId == appId && w.MsgType == SysWxgzhMsgTypeEnum.Text);
-            if (msg != null)
+            var data = SerializationHelper.DeserializeXml<WxgzhTextEventForm>(xmlContent, Encoding.UTF8);
+            if (data.Content.Contains("绑定账号"))
             {
-                result = msg.GetXmlReplyContent(data.FromUserName, data.ToUserName);
+                result = await BindSysAccount(appId, data);
+            }
+            else
+            {
+                var msg = await _replyRepository.GetAsync(w => w.AppId == appId && w.MsgType == SysWxgzhMsgTypeEnum.Text);
+                if (msg != null)
+                {
+                    msg.ReplaceReplyTextContentJsonValue("抱歉，暂时无法理解您的问题");
+                    result = msg.GetXmlReplyContent(data.FromUserName, data.ToUserName);
+                }
             }
             return result;
+        }
+
+        // 绑定系统账号
+        private async Task<string> BindSysAccount(string appId, WxgzhTextEventForm form)
+        {
+            var contentArr = form.Content.Split(':');
+            var msg = await _replyRepository.GetAsync(w => w.AppId == appId && w.MsgType == SysWxgzhMsgTypeEnum.Text);
+            var gzhUser = await _repository.GetAsync(w => w.AppId == appId && w.OpenId == form.FromUserName);
+            if (gzhUser.SysUserId != Guid.Empty)
+            {
+                msg.ReplaceReplyTextContentJsonValue("请勿重复绑定账号");
+            }
+            else
+            {
+                if (gzhUser != null)
+                {
+                    var username = contentArr.Length > 1 ? contentArr[1] : "";
+                    var user = await _userRepository.GetAsync(w => w.UserName == username);
+                    if (user != null)
+                    {
+                        gzhUser.SysUserId = user.Id;
+                        var effected = await _repository.SaveChangesAsync();
+                        if (effected > 0)
+                        {
+                            msg.ReplaceReplyTextContentJsonValue("账号绑定成功！");
+                        }
+                        else
+                        {
+                            msg.ReplaceReplyTextContentJsonValue("账号绑定失败！");
+                        }
+                    }
+                    else
+                    {
+                        msg.ReplaceReplyTextContentJsonValue("账号不存在");
+                    }
+                }
+                else
+                {
+                    msg.ReplaceReplyTextContentJsonValue("请先关注公众号");
+                }
+            }
+
+            if (msg != null)
+                return msg.GetXmlReplyContent(form.FromUserName, form.ToUserName);
+
+            return "";
         }
     }
 }

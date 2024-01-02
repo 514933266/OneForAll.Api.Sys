@@ -13,14 +13,19 @@ using Microsoft.EntityFrameworkCore;
 using Sys.HttpService.Interfaces;
 using OneForAll.Core.Extension;
 using Microsoft.AspNetCore.Authorization;
+using static Org.BouncyCastle.Math.EC.ECCurve;
+using Sys.Host.Models;
+using OneForAll.Core.Security;
 
 namespace Sys.Host.Filters
 {
     public class AuthorizationFilter : IAuthorizationFilter
     {
+        private readonly AuthConfig _config;
         private readonly ISysPermissionCheckHttpService _httpPermService;
-        public AuthorizationFilter(ISysPermissionCheckHttpService httpPermService)
+        public AuthorizationFilter(AuthConfig config, ISysPermissionCheckHttpService httpPermService)
         {
+            _config = config;
             _httpPermService = httpPermService;
         }
 
@@ -31,6 +36,13 @@ namespace Sys.Host.Filters
             {
                 return;
             }
+            var unChecked = context.HttpContext.Request.Headers["Unchecked"];
+            if (!unChecked.IsNull())
+            {
+                // 不检查权限
+                var sign = "clientId={0}&clientSecret={1}&apiName={2}&tt={3}".Fmt(_config.ClientId, _config.ClientSecret, _config.ApiName, DateTime.Now.ToString("yyyyMMddhhmm")).ToMd5();
+                if (unChecked.ToString() == sign) return;
+            };
 
             var classAttrs = new List<CheckPermissionAttribute>();
             var methodAttrs = new List<CheckPermissionAttribute>();
@@ -51,7 +63,12 @@ namespace Sys.Host.Filters
 
                 if (msg.ErrType != BaseErrType.Success)
                 {
-                    context.Result = new JsonResult(msg);
+                    context.Result = new JsonResult(new BaseMessage()
+                    {
+                        Status = false,
+                        ErrType = BaseErrType.PermissionNotEnough,
+                        Message = "对不起，您没有操作此功能的权限"
+                    });
                 }
             }
         }

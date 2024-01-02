@@ -38,9 +38,12 @@ namespace Sys.Domain
         private readonly ISysTenantRepository _repository;
         private readonly ISysPermissionRepository _permRepository;
         private readonly ISysUserRepository _userRepository;
+        private readonly ISysRoleRepository _roleRepository;
         private readonly ISysMenuRepository _menuRepository;
-        private readonly ISysTenantPermContactRepository _contactRepository;
-        private readonly ISysUsertPermContactRepository _userContactRepository;
+        private readonly ISysTenantPermContactRepository _tenantPermRepository;
+        private readonly ISysUsertPermContactRepository _userPermRepository;
+        private readonly ISysRolePermContactRepository _rolePermRepository;
+        private readonly ISysRoleUserContactRepository _roleUserRepository;
 
         public SysTenantManager(
             IMapper mapper,
@@ -49,17 +52,23 @@ namespace Sys.Domain
             ISysTenantRepository repository,
             ISysPermissionRepository permRepository,
             ISysUserRepository userRepository,
+            ISysRoleRepository roleRepository,
             ISysMenuRepository menuRepository,
-            ISysTenantPermContactRepository contactRepository,
-            ISysUsertPermContactRepository userContactRepository) : base(mapper, httpContextAccessor)
+            ISysTenantPermContactRepository tenantPermRepository,
+            ISysUsertPermContactRepository userPermRepository,
+            ISysRolePermContactRepository rolePermRepository,
+            ISysRoleUserContactRepository roleUserRepository) : base(mapper, httpContextAccessor)
         {
             _uploader = uploader;
             _repository = repository;
             _permRepository = permRepository;
             _userRepository = userRepository;
+            _roleRepository = roleRepository;
             _menuRepository = menuRepository;
-            _contactRepository = contactRepository;
-            _userContactRepository = userContactRepository;
+            _tenantPermRepository = tenantPermRepository;
+            _userPermRepository = userPermRepository;
+            _rolePermRepository = rolePermRepository;
+            _roleUserRepository = roleUserRepository;
         }
 
         #region 租户
@@ -115,6 +124,7 @@ namespace Sys.Domain
             {
                 data.Code = StringHelper.GetRandomString(18);
             }
+            data.UpdateTime = DateTime.Now;
             return await ResultAsync(() => _repository.AddAsync(data));
         }
 
@@ -132,6 +142,7 @@ namespace Sys.Domain
 
             data = await _repository.FindAsync(entity.Id);
             data.MapFrom(entity);
+            data.UpdateTime = DateTime.Now;
             return await ResultAsync(() => _repository.UpdateAsync(data));
         }
 
@@ -142,17 +153,38 @@ namespace Sys.Domain
         /// <returns>结果</returns>
         public async Task<BaseErrType> DeleteAsync(IEnumerable<Guid> ids)
         {
-            if (ids.Count() < 1) return BaseErrType.DataEmpty;
+            if (!ids.Any())
+                return BaseErrType.DataEmpty;
             var data = await _repository.GetListAsync(ids);
-            if (data.Count() < 1) return BaseErrType.DataEmpty;
+            if (!data.Any())
+                return BaseErrType.DataEmpty;
+            if (ids.Count() > 1)
+                return BaseErrType.Overflow;
 
-            try
+            var id = ids.First();
+            var perms = await _tenantPermRepository.GetListByTenantAsync(id);
+            var users = await _userRepository.GetListByTenantAsync(id);
+            var userPerms = await _userPermRepository.GetListByTenantAsync(id);
+            var roles = await _roleRepository.GetListByTenantAsync(id);
+            var rolePerms = await _rolePermRepository.GetListByTenantAsync(id);
+            var roleUsers = await _roleUserRepository.GetListByTenantAsync(id);
+
+            using (var tran = new UnitOfWork().BeginTransaction())
             {
-                return await ResultAsync(() => _repository.DeleteRangeAsync(data));
-            }
-            catch
-            {
-                return BaseErrType.NotAllow;
+                await _repository.DeleteRangeAsync(data, tran);
+                if (perms.Any())
+                    await _tenantPermRepository.DeleteRangeAsync(perms, tran);
+                if (users.Any())
+                    await _userRepository.DeleteRangeAsync(users, tran);
+                if (userPerms.Any())
+                    await _userRepository.DeleteRangeAsync(users, tran);
+                if (roles.Any())
+                    await _roleRepository.DeleteRangeAsync(roles, tran);
+                if (rolePerms.Any())
+                    await _rolePermRepository.DeleteRangeAsync(rolePerms, tran);
+                if (roleUsers.Any())
+                    await _roleUserRepository.DeleteRangeAsync(roleUsers, tran);
+                return await ResultAsync(tran.CommitAsync);
             }
         }
 
@@ -257,8 +289,8 @@ namespace Sys.Domain
             perms = permissions.Union(perms).DistinctBy(w => w.Id).ToList();
 
             var users = await _userRepository.GetListDefaultByTenantAsync(id);
-            var tenantPerms = await _contactRepository.GetListByTenantAsync(id);
-            var userPerms = await _userContactRepository.GetListByTenantAsync(id);
+            var tenantPerms = await _tenantPermRepository.GetListByTenantAsync(id);
+            var userPerms = await _userPermRepository.GetListByTenantAsync(id);
 
             var addUserList = new List<SysUserPermContact>();
             var addList = perms.Select(s => new SysTenantPermContact() { SysTenantId = id, SysPermissionId = s.Id }).ToList();
@@ -272,15 +304,15 @@ namespace Sys.Domain
             {
                 // 重置租户权限
                 if (tenantPerms.Any())
-                    await _contactRepository.DeleteRangeAsync(tenantPerms, tran);
+                    await _tenantPermRepository.DeleteRangeAsync(tenantPerms, tran);
                 if (addList.Any())
-                    await _contactRepository.AddRangeAsync(addList, tran);
+                    await _tenantPermRepository.AddRangeAsync(addList, tran);
 
                 // 重置主管理员账号权限
                 if (userPerms.Any())
-                    await _userContactRepository.DeleteRangeAsync(userPerms, tran);
+                    await _userPermRepository.DeleteRangeAsync(userPerms, tran);
                 if (addUserList.Any())
-                    await _userContactRepository.AddRangeAsync(addUserList, tran);
+                    await _userPermRepository.AddRangeAsync(addUserList, tran);
                 return await ResultAsync(tran.CommitAsync);
             }
         }

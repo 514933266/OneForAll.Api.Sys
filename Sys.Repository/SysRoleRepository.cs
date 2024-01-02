@@ -30,7 +30,7 @@ namespace Sys.Repository
         /// <param name="pageSize">页数</param>
         /// <param name="key">关键字</param>
         /// <returns>结果</returns>
-        public async Task<PageList<SysRole>> GetPageWithContactsAsync(int pageIndex, int pageSize, string key)
+        public async Task<PageList<SysRole>> GetPageAsync(int pageIndex, int pageSize, string key)
         {
             var predicate = PredicateBuilder.Create<SysRole>(w => true);
             if (!key.IsNullOrEmpty()) predicate = predicate.And(w => w.Name.Contains(key));
@@ -43,25 +43,9 @@ namespace Sys.Repository
                 .Where(predicate)
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
-                .Include(e => e.SysRolePermContacts)
-                .Include(e => e.SysRoleUserContacts)
                 .ToListAsync();
 
             return new PageList<SysRole>(total, pageSize, pageIndex, data);
-        }
-
-        /// <summary>
-        /// 查询实体（含成员）
-        /// </summary>
-        /// <param name="id">实体id</param>
-        /// <returns>实体</returns>
-        public async Task<SysRole> GetWithMembersAsync(Guid id)
-        {
-            return await DbSet
-                .Where(w => w.Id.Equals(id))
-                .Include(e => e.SysRoleUserContacts)
-                    .ThenInclude(e => e.SysUser)
-                .FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -78,20 +62,6 @@ namespace Sys.Repository
         }
 
         /// <summary>
-        /// 查询实体（含权限）
-        /// </summary>
-        /// <param name="id">实体id</param>
-        /// <returns>结果</returns>
-        public async Task<SysRole> GetWithPermsAsync(Guid id)
-        {
-            return await DbSet
-                .Where(w => w.Id.Equals(id))
-                .Include(e => e.SysRolePermContacts)
-                    .ThenInclude(e => e.SysPermission)
-                .FirstOrDefaultAsync();
-        }
-
-        /// <summary>
         /// 查询列表
         /// </summary>
         /// <param name="ids">角色id</param>
@@ -101,6 +71,16 @@ namespace Sys.Repository
             return await DbSet
                 .Where(w => ids.Contains(w.Id))
                 .ToListAsync();
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <param name="tenantId">租户id</param>
+        /// <returns>用户</returns>
+        public async Task<IEnumerable<SysRole>> GetListByTenantAsync(Guid tenantId)
+        {
+            return await DbSet.Where(w => w.SysTenantId == tenantId).ToListAsync();
         }
     }
 }

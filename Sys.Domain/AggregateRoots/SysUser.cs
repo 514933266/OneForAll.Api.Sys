@@ -1,6 +1,8 @@
-﻿using OneForAll.Core.DDD;
+﻿using OneForAll.Core;
+using OneForAll.Core.DDD;
 using OneForAll.Core.Extension;
 using OneForAll.Core.Security;
+using Sys.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -42,6 +44,13 @@ namespace Sys.Domain.AggregateRoots
         public string Name { get; set; }
 
         /// <summary>
+        /// 手机号码
+        /// </summary>
+        [Required]
+        [StringLength(20)]
+        public string Mobile { get; set; } = "";
+
+        /// <summary>
         /// 头像
         /// </summary>
         [Required]
@@ -56,10 +65,10 @@ namespace Sys.Domain.AggregateRoots
         public string Signature { get; set; } = "";
 
         /// <summary>
-        /// 用户状态（关联BaseErrType，1正常 0异常 -20006禁止登录)
+        /// 用户状态
         /// </summary>
         [Required]
-        public int Status { get; set; }
+        public SysUserStatusEnum Status { get; set; } = SysUserStatusEnum.Normal;
 
         /// <summary>
         /// 是否默认（默认用户禁止删除）
@@ -70,7 +79,7 @@ namespace Sys.Domain.AggregateRoots
         /// <summary>
         /// 最后登陆时间
         /// </summary>
-        [Column(TypeName ="datetime")]
+        [Column(TypeName = "datetime")]
         public DateTime? LastLoginTime { get; set; }
 
         /// <summary>
@@ -91,39 +100,5 @@ namespace Sys.Domain.AggregateRoots
         /// </summary>
         [Required]
         public byte PwdErrCount { get; set; }
-
-
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="tenant">所属租户</param>
-        public void Init(SysTenant tenant)
-        {
-            Id = Guid.NewGuid();
-            SysTenantId = tenant.Id;
-            IsDefault = true;
-            Name = "管理员";
-            Status = 1;
-            UserName = tenant.Name;
-            Password = tenant.Code.ToMd5();
-        }
-
-        /// <summary>
-        /// 同步租户权限
-        /// </summary>
-        /// <param name="permissions"></param>
-        public void CopyPermission(IEnumerable<SysTenantPermContact> permissions)
-        {
-            //SysUserPermContacts.Clear();
-            //permissions.ForEach(e =>
-            //{
-            //    SysUserPermContacts.Add(new SysUserPermContact()
-            //    {
-            //        Id = Guid.NewGuid(),
-            //        SysUserId = Id,
-            //        SysPermissionId = e.SysPermissionId
-            //    });
-            //});
-        }
     }
 }

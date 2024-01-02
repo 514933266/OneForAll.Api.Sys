@@ -1,6 +1,5 @@
 ﻿using OneForAll.Core;
-using OneForAll.EFCore;
-using Sys.Domain.AggregateRoots;
+using Sys.Application.Dtos;
 using Sys.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -8,32 +7,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sys.Domain.Interfaces
+namespace Sys.Application.Interfaces
 {
     /// <summary>
-    /// 微信客户端
+    /// 系统客户端
     /// </summary>
-    public interface ISysWxClientSettingManager
+    public interface ISysClientService
     {
         /// <summary>
         /// 获取列表
         /// </summary>
         /// <returns>列表</returns>
-        Task<IEnumerable<SysWxClientSetting>> GetListAsync();
+        Task<IEnumerable<SysClientDto>> GetListAsync();
 
         /// <summary>
         /// 添加
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> AddAsync(SysWxClientSettingForm form);
+        Task<BaseErrType> AddAsync(SysClientForm form);
 
         /// <summary>
         /// 修改
         /// </summary>
         /// <param name="form">实体</param>
         /// <returns>结果</returns>
-        Task<BaseErrType> UpdateAsync(SysWxClientSettingForm form);
+        Task<BaseErrType> UpdateAsync(SysClientForm form);
 
         /// <summary>
         /// 删除

@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Sys.Domain.Repositorys
 {
     /// <summary>
-    /// 微信客户端
+    /// 微信客户端-系统客户端关联
     /// </summary>
-    public interface ISysWxClientSettingRepository : IEFCoreRepository<SysWxClientSetting>
+    public interface ISysWxClientContactRepository : IEFCoreRepository<SysWxClientContact>
     {
     }
 }

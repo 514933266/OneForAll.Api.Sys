@@ -41,8 +41,8 @@ namespace Sys.Domain.AggregateRoots
         [Required]
         [StringLength(1000)]
         public string LogoUrl { get; set; } = "";
-        
-        
+
+
         /// <summary>
         /// 负责人
         /// </summary>
@@ -89,5 +89,11 @@ namespace Sys.Domain.AggregateRoots
         [Required]
         [Column(TypeName = "datetime")]
         public DateTime CreateTime { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// 修改时间
+        /// </summary>
+        [Column(TypeName = "datetime")]
+        public DateTime? UpdateTime { get; set; }
     }
 }

@@ -92,13 +92,23 @@ namespace Sys.Repository
         }
 
         /// <summary>
-        /// 查询列表（默认账号）
+        /// 查询默认账号列表
         /// </summary>
-        /// <param name="tenantId">用户id</param>
+        /// <param name="tenantId">租户id</param>
         /// <returns>用户</returns>
         public async Task<IEnumerable<SysUser>> GetListDefaultByTenantAsync(Guid tenantId)
         {
             return await DbSet.Where(w => w.SysTenantId == tenantId && w.IsDefault).ToListAsync();
+        }
+
+        /// <summary>
+        /// 查询列表
+        /// </summary>
+        /// <param name="tenantId">租户id</param>
+        /// <returns>用户</returns>
+        public async Task<IEnumerable<SysUser>> GetListByTenantAsync(Guid tenantId)
+        {
+            return await DbSet.Where(w => w.SysTenantId == tenantId).ToListAsync();
         }
 
         /// <summary>

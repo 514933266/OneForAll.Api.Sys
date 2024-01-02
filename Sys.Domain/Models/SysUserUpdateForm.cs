@@ -1,24 +1,19 @@
-﻿using OneForAll.Core.DDD;
-using Sys.Domain.Enums;
+﻿using Sys.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Sys.Domain.Models
 {
     /// <summary>
-    /// 用户
+    /// 修改用户信息
     /// </summary>
-    public class SysUserForm
+    public class SysUserUpdateForm
     {
         public Guid Id { get; set; }
-
-        /// <summary>
-        /// 租户id
-        /// </summary>
-        [Required]
-        public Guid TenantId { get; set; }
 
         /// <summary>
         /// 用户名
@@ -26,18 +21,6 @@ namespace Sys.Domain.Models
         [Required]
         [StringLength(20)]
         public string UserName { get; set; }
-
-        /// <summary>
-        /// 密码
-        /// </summary>
-        [StringLength(32)]
-        public string Password { get; set; }
-
-        /// <summary>
-        /// 重复密码
-        /// </summary>
-        [StringLength(32)]
-        public string RePassword { get; set; }
 
         /// <summary>
         /// 昵称
