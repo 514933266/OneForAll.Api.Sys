@@ -92,7 +92,7 @@ namespace Sys.Host
                     c.SwaggerDoc(version, new OpenApiInfo
                     {
                         Version = version,
-                        Title = $"系统基础服务接口文档 {version}",
+                        Title = $"开发人员相关服务-接口文档 {version}",
                         Description = $"OneForAll Base Web API {version}"
                     });
                 });
@@ -185,7 +185,7 @@ namespace Sys.Host
 
             #region DI
 
-            services.AddDbContext<OneForAllContext>(options =>
+            services.AddDbContext<SysContext>(options =>
                 options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
             services.AddSingleton<IUploader, Uploader>();
             services.AddScoped<ITenantProvider, TenantProvider>();
@@ -230,10 +230,10 @@ namespace Sys.Host
                 .Where(t => t.Name.EndsWith("Manager"))
                 .AsImplementedInterfaces();
 
-            builder.RegisterType(typeof(OneForAllContext)).Named<DbContext>("OneForAllContext");
+            builder.RegisterType(typeof(SysContext)).Named<DbContext>("SysContext");
             builder.RegisterAssemblyTypes(Assembly.Load(BASE_REPOSITORY))
                .Where(t => t.Name.EndsWith("Repository"))
-               .WithParameter(ResolvedParameter.ForNamed<DbContext>("OneForAllContext"))
+               .WithParameter(ResolvedParameter.ForNamed<DbContext>("SysContext"))
                .AsImplementedInterfaces();
         }
 
@@ -261,7 +261,7 @@ namespace Sys.Host
                 RequestPath = new PathString("/resources"),
                 OnPrepareResponse = (c) =>
                 {
-                    c.Context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    c.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
                 }
             });
 

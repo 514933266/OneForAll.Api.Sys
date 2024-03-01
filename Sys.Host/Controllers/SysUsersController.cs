@@ -10,6 +10,7 @@ using OneForAll.Core;
 using System.Collections.Generic;
 using Sys.Public.Models;
 using Sys.Host.Filters;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host.Controllers
 {
@@ -35,7 +36,7 @@ namespace Sys.Host.Controllers
         /// <returns>用户列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysUserDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _service.GetPageAsync(pageIndex, pageSize, key);

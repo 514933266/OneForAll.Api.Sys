@@ -9,6 +9,7 @@ using Sys.Application.Interfaces;
 using System.Collections.Generic;
 using Sys.Public.Models;
 using Sys.Host.Filters;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host.Controllers
 {
@@ -35,7 +36,7 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysContactUsDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _permService.GetPageAsync(pageIndex, pageSize, key);
@@ -48,7 +49,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();

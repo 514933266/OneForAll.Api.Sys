@@ -78,7 +78,6 @@ namespace Sys.Domain
         /// <returns>结果</returns>
         public async Task<BaseErrType> UpdateAsync(SysWxClientgForm form)
         {
-            var changed = false;
             var exists = await _repository.CountAsync(w => w.AppId == form.AppId && w.Id != form.Id);
             if (exists > 0)
                 return BaseErrType.DataExist;

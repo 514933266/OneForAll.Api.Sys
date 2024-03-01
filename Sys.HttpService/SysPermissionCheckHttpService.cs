@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Sys.HttpService.Models;
 using Sys.HttpService.Interfaces;
 using Sys.Public.Models;
+using OneForAll.Core.OAuth;
 
 namespace ZSSys.HttpService
 {

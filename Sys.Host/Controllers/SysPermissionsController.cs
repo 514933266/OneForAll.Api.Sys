@@ -9,6 +9,7 @@ using Sys.Application.Interfaces;
 using System.Collections.Generic;
 using Sys.Public.Models;
 using Sys.Host.Filters;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host.Controllers
 {
@@ -36,7 +37,7 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysPermissionDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key, [FromQuery] Guid menuId)
         {
             return await _permService.GetPageAsync(pageIndex, pageSize, key, menuId);

@@ -35,14 +35,14 @@ namespace Sys.Application
         /// <returns>用户</returns>
         public async Task<SysWxgzhNotifyUserDto> GetAsync(Guid userId, string clientId)
         {
-            var result = new SysWxgzhNotifyUserDto();
+            var result = new SysWxgzhNotifyUserDto() { IsUnSubscribed = true };
             var client = await _clientRepository.GetByClientIdAsync(clientId);
             if (client != null)
             {
                 var data = await _repository.GetAsync(w => w.SysUserId == userId && w.AppId == client.AppId && !w.IsUnSubscribed);
                 if (data != null)
                 {
-                    result = _mapper.Map<SysWxgzhSubscribeUser, SysWxgzhNotifyUserDto>(data);
+                    result = _mapper.Map<SysWxgzhNotifyUserDto>(data);
                     result.AppAccessToken = client.AccessToken;
                 }
             }

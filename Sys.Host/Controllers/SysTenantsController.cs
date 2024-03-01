@@ -14,6 +14,7 @@ using Autofac.Core;
 using Sys.Host.Filters;
 using Microsoft.AspNetCore.Http;
 using OneForAll.Core.Upload;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host.Controllers
 {
@@ -40,7 +41,7 @@ namespace Sys.Host.Controllers
         /// <returns>租户</returns>
         [HttpGet]
         [Route("{id}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<SysTenantDto> GetAsync(Guid id)
         {
             return await _service.GetAsync(id);
@@ -70,7 +71,7 @@ namespace Sys.Host.Controllers
         /// <returns>租户列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysTenantDto>> GetPageAsync(
             int pageIndex,
             int pageSize,
@@ -148,7 +149,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/Logos")]
-        [CheckPermission(Action = ConstPermission.UPDATE)]
+        [CheckPermission(Action = ConstPermission.Update)]
         public async Task<BaseMessage> UploadLogoAsync(Guid id, [FromForm] IFormCollection form)
         {
             var msg = new BaseMessage();
@@ -181,7 +182,7 @@ namespace Sys.Host.Controllers
         /// <returns>菜单列表</returns>
         [HttpGet]
         [Route("{id}/Menus")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<IEnumerable<SysMenuTreeDto>> GetListMenuAsync(Guid id)
         {
             return await _service.GetListMenuAsync(id);
@@ -198,7 +199,7 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{id}/Permissions")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<IEnumerable<SysMenuPermissionDto>> GetListPermissionAsync(Guid id)
         {
             return await _service.GetListPermissionAsync(id);
@@ -212,7 +213,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/Permissions")]
-        [CheckPermission(Action = ConstPermission.UPDATE)]
+        [CheckPermission(Action = ConstPermission.Update)]
         public async Task<BaseMessage> AddPermissionAsync(Guid id, [FromBody] IEnumerable<SysMenuPermissionForm> entities)
         {
             var msg = new BaseMessage();

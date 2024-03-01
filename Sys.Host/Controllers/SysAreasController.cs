@@ -10,6 +10,7 @@ using Sys.Application.Dtos;
 using Sys.Application.Interfaces;
 using Sys.Public.Models;
 using Sys.Host.Filters;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host.Controllers
 {
@@ -32,7 +33,7 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysAreaDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key, [FromQuery] int parentId = -1)
         {
             return await _areaService.GetPageAsync(pageIndex, pageSize, key, parentId);
@@ -62,7 +63,7 @@ namespace Sys.Host.Controllers
         /// 添加
         /// </summary>
         [HttpPost]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<BaseMessage> AddAsync([FromBody] SysAreaForm entity)
         {
             var msg = new BaseMessage();
@@ -81,7 +82,7 @@ namespace Sys.Host.Controllers
         /// 修改
         /// </summary>
         [HttpPut]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysAreaForm entity)
         {
 
@@ -104,7 +105,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<int> ids)
         {
             var msg = new BaseMessage();

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Linq;
 using Sys.Public.Models;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host
 {

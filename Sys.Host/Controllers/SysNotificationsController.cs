@@ -12,6 +12,7 @@ using Sys.Public.Models;
 using Sys.Host.Filters;
 using Microsoft.AspNetCore.Http;
 using OneForAll.Core.Upload;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host.Controllers
 {
@@ -40,7 +41,7 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysNotificationDto>> GetPageAsync(
             int pageIndex,
             int pageSize,
@@ -111,7 +112,7 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpPost]
         [Route("{id}/Images")]
-        [CheckPermission(Action = ConstPermission.UPDATE)]
+        [CheckPermission(Action = ConstPermission.Update)]
         public async Task<BaseMessage> UploadImageAsync(Guid id, [FromForm] IFormCollection form)
         {
             var msg = new BaseMessage();
@@ -138,7 +139,7 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpPatch]
         [Route("{id}/IsPublish")]
-        [CheckPermission(Action = ConstPermission.UPDATE)]
+        [CheckPermission(Action = ConstPermission.Update)]
         public async Task<BaseMessage> PublishAsync(Guid id)
         {
             var msg = new BaseMessage();

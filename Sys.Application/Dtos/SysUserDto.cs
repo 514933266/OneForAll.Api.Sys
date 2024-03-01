@@ -2,6 +2,8 @@
 using Sys.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Sys.Application.Dtos
@@ -60,5 +62,10 @@ namespace Sys.Application.Dtos
         /// 最后登录Ip
         /// </summary>
         public string LastLoginIp { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreateTime { get; set; } = DateTime.Now;
     }
 }

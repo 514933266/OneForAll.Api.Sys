@@ -8,6 +8,7 @@ using AutoMapper;
 using OneForAll.Core.DDD;
 using Sys.Public.Models;
 using Sys.Domain.AggregateRoots;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Domain
 {
@@ -27,77 +28,21 @@ namespace Sys.Domain
             _httpContextAccessor = httpContextAccessor;
         }
 
-        protected Guid UserId
-        {
-            get
-            {
-                var userId = _httpContextAccessor.HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(e => e.Type == UserClaimType.USER_ID);
-
-                if (userId != null)
-                {
-                    return new Guid(userId.Value);
-                }
-                return Guid.Empty;
-            }
-        }
-
-        protected string UserName
-        {
-            get
-            {
-                var username = _httpContextAccessor.HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(e => e.Type == UserClaimType.USERNAME);
-
-                if (username != null)
-                {
-                    return username.Value;
-                }
-                return null;
-            }
-        }
-
-        protected Guid SysTenantId
-        {
-            get
-            {
-                var tenantId = _httpContextAccessor.HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(e => e.Type == UserClaimType.TENANT_ID);
-
-                if (tenantId != null)
-                {
-                    return new Guid(tenantId.Value);
-                }
-                return Guid.Empty;
-            }
-        }
-
         protected LoginUser LoginUser
         {
             get
             {
-                var name = _httpContextAccessor.HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(e => e.Type == UserClaimType.USER_NICKNAME);
-
-                var role = _httpContextAccessor.HttpContext
-                .User
-                .Claims
-                .FirstOrDefault(e => e.Type == UserClaimType.ROLE);
+                var role = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(e => e.Type == UserClaimType.ROLE);
+                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(e => e.Type == UserClaimType.USER_ID);
+                var name = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(e => e.Type == UserClaimType.USER_NICKNAME);
+                var tenantId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(e => e.Type == UserClaimType.TENANT_ID);
 
                 return new LoginUser()
                 {
-                    Id = UserId,
-                    Name = name.Value,
-                    SysTenantId = SysTenantId,
-                    IsDefault = role.Value.Equals(UserRoleType.RULER)
+                    Id = userId == null ? Guid.Empty : new Guid(userId.Value),
+                    Name = name == null ? "无" : name?.Value,
+                    SysTenantId = tenantId == null ? Guid.Empty : new Guid(tenantId?.Value),
+                    IsDefault = role == null ? false : role.Value.Equals(UserRoleType.RULER)
                 };
             }
         }

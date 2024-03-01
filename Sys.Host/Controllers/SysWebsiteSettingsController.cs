@@ -12,6 +12,7 @@ using Sys.Public.Models;
 using Microsoft.AspNetCore.Http;
 using OneForAll.Core.Upload;
 using Sys.Host.Filters;
+using OneForAll.Core.OAuth;
 
 namespace Sys.Host.Controllers
 {
@@ -37,7 +38,7 @@ namespace Sys.Host.Controllers
         /// <returns>分页列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysWebsiteSettingDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _service.GetPageAsync(pageIndex, pageSize, key);
@@ -50,7 +51,7 @@ namespace Sys.Host.Controllers
         /// <returns>实体</returns>
         [HttpGet]
         [Route("{id}")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<SysWebsiteSettingDto> GetAsync(Guid id)
         {
             return await _service.GetAsync(id);
@@ -126,7 +127,7 @@ namespace Sys.Host.Controllers
         /// <returns>实体</returns>
         [HttpGet]
         [Route("{id}/Apis")]
-        [CheckPermission(Action = ConstPermission.VIEW)]
+        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<IEnumerable<SysWebsiteApiSettingDto>> GetListApiAsync(Guid id)
         {
             return await _service.GetListApiAsync(id);
@@ -140,7 +141,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/Apis")]
-        [CheckPermission(Action = ConstPermission.UPDATE)]
+        [CheckPermission(Action = ConstPermission.Update)]
         public async Task<BaseMessage> AddApiAsync(Guid id, [FromBody] SysWebsiteApiSettingForm entity)
         {
             var msg = new BaseMessage();
@@ -162,7 +163,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPut]
         [Route("{id}/Apis")]
-        [CheckPermission(Action = ConstPermission.UPDATE)]
+        [CheckPermission(Action = ConstPermission.Update)]
         public async Task<BaseMessage> UpdateApiAsync(Guid id, [FromBody] SysWebsiteApiSettingForm entity)
         {
             var msg = new BaseMessage();
@@ -184,7 +185,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("{id}/Apis/Batch/IsDeleted")]
-        [CheckPermission(Action = ConstPermission.DELETE)]
+        [CheckPermission(Action = ConstPermission.Delete)]
         public async Task<BaseMessage> DeleteApiAsync(Guid id, [FromBody] IEnumerable<Guid> ids)
         {
             var msg = new BaseMessage();
@@ -210,7 +211,7 @@ namespace Sys.Host.Controllers
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/BackgroundUrl")]
-        [CheckPermission(Action = ConstPermission.UPDATE)]
+        [CheckPermission(Action = ConstPermission.Update)]
         public async Task<BaseMessage> UploadImageAsync(Guid id, [FromForm] IFormCollection form)
         {
             var msg = new BaseMessage();

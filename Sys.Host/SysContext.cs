@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Sys.Host
 {
-    public partial class OneForAllContext : DbContext
+    public partial class SysContext : DbContext
     {
-        public OneForAllContext(DbContextOptions<OneForAllContext> options)
+        public SysContext(DbContextOptions<SysContext> options)
             : base(options)
         {
 
@@ -30,6 +30,7 @@ namespace Sys.Host
         #region 系统用户
 
         public virtual DbSet<SysTenant> SysTenant { get; set; }
+        public virtual DbSet<SysTenantServiceSetting> SysTenantServiceSetting { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysClient> SysClient { get; set; }
         public virtual DbSet<SysRole> SysRole { get; set; }
@@ -121,24 +122,28 @@ namespace Sys.Host
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
+            modelBuilder.Entity<SysTenantServiceSetting>(entity =>
+            {
+                entity.ToTable("Sys_TenantServiceSetting");
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(e => e.SysTenantId).IsUnique();
+            });
+
             modelBuilder.Entity<SysUser>(entity =>
             {
                 entity.ToTable("Sys_User");
-
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<SysClient>(entity =>
             {
                 entity.ToTable("Sys_Client");
-
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
             modelBuilder.Entity<SysRole>(entity =>
             {
                 entity.ToTable("Sys_Role");
-
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
             });
 
