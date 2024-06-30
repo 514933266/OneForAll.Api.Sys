@@ -2,6 +2,7 @@
 using OneForAll.Core.DDD;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 
@@ -42,6 +43,11 @@ namespace Sys.Application.Dtos
         /// 页面路由
         /// </summary>
         public string Url { get; set; }
+
+        /// <summary>
+        /// Api地址
+        /// </summary>
+        public string ApiUrl { get; set; }
 
         /// <summary>
         /// 图标

@@ -19,8 +19,8 @@ namespace Sys.Host.Controllers
     [Route("api/[controller]")]
     public class SysWxgzhNotifyUsersController : BaseController
     {
-        private readonly ISysWxgzhNotifyUserService _service;
-        public SysWxgzhNotifyUsersController(ISysWxgzhNotifyUserService service)
+        private readonly ISysWxgzhSubscribeUserService _service;
+        public SysWxgzhNotifyUsersController(ISysWxgzhSubscribeUserService service)
         {
             _service = service;
         }
@@ -32,7 +32,7 @@ namespace Sys.Host.Controllers
         /// <param name="clientId">客户端Id</param>
         /// <returns>用户</returns>
         [HttpGet]
-        public async Task<SysWxgzhNotifyUserDto> GetAsync([FromQuery] Guid userId, [FromQuery] string clientId)
+        public async Task<SysWxgzhSubscribeUserTokenDto> GetAsync([FromQuery] Guid userId, [FromQuery] string clientId)
         {
             return await _service.GetAsync(userId, clientId);
         }

@@ -22,6 +22,6 @@ namespace Sys.Domain.Repositorys
         /// <param name="pageSize">页数</param>
         /// <param name="appId">所属微信应用id</param>
         /// <returns>分页列表</returns>
-        Task<PageList<SysWxgzhReplySettingAggr>> GetPageAsync(int pageIndex, int pageSize, string appId);
+        Task<PageList<SysWxgzhReplySetting>> GetPageAsync(int pageIndex, int pageSize, string appId);
     }
 }

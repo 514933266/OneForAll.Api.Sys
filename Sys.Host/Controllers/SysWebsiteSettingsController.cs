@@ -38,7 +38,6 @@ namespace Sys.Host.Controllers
         /// <returns>分页列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysWebsiteSettingDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _service.GetPageAsync(pageIndex, pageSize, key);
@@ -51,7 +50,6 @@ namespace Sys.Host.Controllers
         /// <returns>实体</returns>
         [HttpGet]
         [Route("{id}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<SysWebsiteSettingDto> GetAsync(Guid id)
         {
             return await _service.GetAsync(id);
@@ -127,7 +125,6 @@ namespace Sys.Host.Controllers
         /// <returns>实体</returns>
         [HttpGet]
         [Route("{id}/Apis")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<IEnumerable<SysWebsiteApiSettingDto>> GetListApiAsync(Guid id)
         {
             return await _service.GetListApiAsync(id);

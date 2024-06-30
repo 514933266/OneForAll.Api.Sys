@@ -49,31 +49,26 @@ namespace Sys.Domain.Enums
         /// <summary>
         /// 微信广告
         /// </summary>
-        WechatAdv = 1007,
-
-        /// <summary>
-        /// 微信广告
-        /// </summary>
-        WechatAdvertisement = 1008,
+        WechatAdvertisement = 1007,
 
         /// <summary>
         /// 他人转载 
         /// </summary>
-        RepRint = 1009,
+        RepRint = 1008,
 
         /// <summary>
         /// 视频号直播 
         /// </summary>
-        LiveStream = 1010,
+        LiveStream = 1009,
 
         /// <summary>
         /// 视频号 
         /// </summary>
-        Channels = 1011,
+        Channels = 1010,
 
         /// <summary>
         /// 其他 
         /// </summary>
-        Other = 9999,
+        Other = 99,
     }
 }

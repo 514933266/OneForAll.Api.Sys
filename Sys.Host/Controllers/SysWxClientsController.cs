@@ -32,7 +32,6 @@ namespace Sys.Host.Controllers
         /// </summary>
         /// <returns>列表</returns>
         [HttpGet]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<IEnumerable<SysWxClientDto>> GetPageAsync()
         {
             return await _service.GetListAsync();

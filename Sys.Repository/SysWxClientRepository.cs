@@ -72,5 +72,32 @@ namespace Sys.Repository
 
             return await sql.FirstOrDefaultAsync();
         }
+
+        /// <summary>
+        /// 查询指定appId对应的微信客户端信息
+        /// </summary>
+        /// <param name="appIds">微信appId</param>
+        /// <returns>系统用户</returns>
+        public async Task<IEnumerable<SysWxClientAggr>> GetListByAppIdAsync(List<string> appIds)
+        {
+            var clientDbSet = Context.Set<SysClient>();
+            var contactDbSet = Context.Set<SysWxClientContact>();
+            var sql = (from client in clientDbSet
+                       join contact in contactDbSet on client.Id equals contact.SysClientId
+                       join wxClient in DbSet on contact.SysWxClientId equals wxClient.Id
+                       where (appIds.Contains(wxClient.AppId))
+                       select new SysWxClientAggr()
+                       {
+                           Id = wxClient.Id,
+                           AppId = wxClient.AppId,
+                           AppSecret = wxClient.AppSecret,
+                           AccessToken = wxClient.AccessToken,
+                           AccessTokenExpiresIn = wxClient.AccessTokenExpiresIn,
+                           AccessTokenCreateTime = wxClient.AccessTokenCreateTime,
+                           SysClient = client
+                       });
+
+            return await sql.ToListAsync();
+        }
     }
 }

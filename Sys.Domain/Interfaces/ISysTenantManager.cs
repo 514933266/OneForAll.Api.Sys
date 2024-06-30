@@ -99,10 +99,10 @@ namespace Sys.Domain.Interfaces
         /// 添加权限
         /// </summary>
         /// <param name="id">租户id</param>
-        /// <param name="entities">权限表单</param>
+        /// <param name="pids">权限id</param>
         /// <returns>结果</returns>
 
-        Task<BaseErrType> AddPermissionAsync(Guid id, IEnumerable<SysMenuPermissionForm> entities);
+        Task<BaseErrType> AddPermissionAsync(Guid id, IEnumerable<Guid> pids);
         
         #endregion
 

@@ -34,6 +34,7 @@ using Quartz.Impl;
 using Quartz.Spi;
 using Quartz;
 using Sys.Host.Providers;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Sys.Host
 {
@@ -118,32 +119,7 @@ namespace Sys.Host
             });
             #endregion
 
-            #region Quartz
-
-            var quartzConfig = new QuartzScheduleJobConfig();
-            Configuration.GetSection(QUARTZ).Bind(quartzConfig);
-            // 注册QuartzJobs目录下的定时任务
-            if (quartzConfig != null)
-            {
-                services.AddSingleton(quartzConfig);
-                services.AddSingleton<IJobFactory, ScheduleJobFactory>();
-                services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-                services.AddHostedService<QuartzJobHostService>();
-                var jobNamespace = BASE_HOST.Append(".QuartzJobs");
-                quartzConfig.ScheduleJobs.ForEach(e =>
-                {
-                    var typeName = jobNamespace + "." + e.TypeName;
-                    var jobType = Assembly.Load(BASE_HOST).GetType(typeName);
-                    if (jobType != null)
-                    {
-                        e.JobType = jobType;
-                        services.AddSingleton(e.JobType);
-                    }
-                });
-            }
-            #endregion
-
-            #region Http
+            #region Http请求服务
 
             var serviceConfig = new HttpServiceConfig();
             Configuration.GetSection(HTTP_SERVICE_KEY).Bind(serviceConfig);
@@ -172,10 +148,6 @@ namespace Sys.Host
 
             #endregion
 
-            #region SingleR
-            services.AddSignalR();
-            #endregion
-
             #region AutoMapper
             services.AddAutoMapper(config =>
             {
@@ -185,8 +157,6 @@ namespace Sys.Host
 
             #region DI
 
-            services.AddDbContext<SysContext>(options =>
-                options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
             services.AddSingleton<IUploader, Uploader>();
             services.AddScoped<ITenantProvider, TenantProvider>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -209,28 +179,59 @@ namespace Sys.Host
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             }).AddXmlSerializerFormatters();
             #endregion
+
+            #region Quartz
+
+            var quartzConfig = new QuartzScheduleJobConfig();
+            Configuration.GetSection(QUARTZ).Bind(quartzConfig);
+            // 注册QuartzJobs目录下的定时任务
+            if (quartzConfig != null)
+            {
+                services.AddSingleton(quartzConfig);
+                services.AddSingleton<IJobFactory, ScheduleJobFactory>();
+                services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+                services.AddHostedService<QuartzJobHostService>();
+                var jobNamespace = BASE_HOST.Append(".QuartzJobs");
+                quartzConfig.ScheduleJobs.ForEach(e =>
+                {
+                    var typeName = jobNamespace + "." + e.TypeName;
+                    var jobType = Assembly.Load(BASE_HOST).GetType(typeName);
+                    if (jobType != null)
+                    {
+                        e.JobType = jobType;
+                        services.AddSingleton(e.JobType);
+                    }
+                });
+            }
+            #endregion
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            // Http
+            // Http数据服务
             builder.RegisterAssemblyTypes(Assembly.Load(HTTP_SERVICE))
                .Where(t => t.Name.EndsWith("Service"))
                .AsImplementedInterfaces();
 
-            // 基础
-            builder.RegisterGeneric(typeof(Repository<>))
-                .As(typeof(IEFCoreRepository<>));
-
+            // 应用层
             builder.RegisterAssemblyTypes(Assembly.Load(BASE_APPLICATION))
                 .Where(t => t.Name.EndsWith("Service"))
                 .AsImplementedInterfaces();
 
+            // 领域层
             builder.RegisterAssemblyTypes(Assembly.Load(BASE_DOMAIN))
                 .Where(t => t.Name.EndsWith("Manager"))
                 .AsImplementedInterfaces();
 
-            builder.RegisterType(typeof(SysContext)).Named<DbContext>("SysContext");
+            // 仓储层
+            builder.Register(p =>
+            {
+                var optionBuilder = new DbContextOptionsBuilder<SysContext>();
+                optionBuilder.UseSqlServer(Configuration["ConnectionStrings:Default"]);
+                return optionBuilder.Options;
+            }).AsSelf();
+
+            builder.RegisterType<SysContext>().Named<DbContext>("SysContext");
             builder.RegisterAssemblyTypes(Assembly.Load(BASE_REPOSITORY))
                .Where(t => t.Name.EndsWith("Repository"))
                .WithParameter(ResolvedParameter.ForNamed<DbContext>("SysContext"))

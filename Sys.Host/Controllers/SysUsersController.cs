@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Sys.Public.Models;
 using Sys.Host.Filters;
 using OneForAll.Core.OAuth;
+using OneForAll.Core.Extension;
 
 namespace Sys.Host.Controllers
 {
@@ -36,7 +37,6 @@ namespace Sys.Host.Controllers
         /// <returns>用户列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysUserDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _service.GetPageAsync(pageIndex, pageSize, key);
@@ -48,6 +48,7 @@ namespace Sys.Host.Controllers
         /// <param name="ids">关键字</param>
         /// <returns>用户列表</returns>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IEnumerable<SysUserDto>> GetListAsync([FromQuery] IEnumerable<Guid> ids)
         {
             return await _service.GetListAsync(ids);
@@ -76,17 +77,7 @@ namespace Sys.Host.Controllers
         [CheckPermission]
         public async Task<BaseMessage> AddAsync([FromBody] SysUserForm form)
         {
-            var msg = new BaseMessage();
-            msg.ErrType = await _service.AddAsync(form);
-
-            switch (msg.ErrType)
-            {
-                case BaseErrType.Success: return msg.Success("添加成功");
-                case BaseErrType.DataExist: return msg.Fail("用户名已被使用");
-                case BaseErrType.DataError: return msg.Fail("租户不存在");
-                case BaseErrType.NotAllow: return msg.Fail("该租户已经存在默认账户");
-                default: return msg.Fail("添加失败");
-            }
+            return await _service.AddAsync(form);
         }
 
         /// <summary>
@@ -98,16 +89,7 @@ namespace Sys.Host.Controllers
         [CheckPermission]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysUserUpdateForm form)
         {
-            var msg = new BaseMessage();
-            msg.ErrType = await _service.UpdateAsync(form);
-
-            switch (msg.ErrType)
-            {
-                case BaseErrType.Success: return msg.Success("修改成功");
-                case BaseErrType.DataExist: return msg.Fail("用户名已被使用");
-                case BaseErrType.NotAllow: return msg.Fail("已存在其他默认账号");
-                default: return msg.Fail("修改失败");
-            }
+            return await _service.UpdateAsync(form);
         }
 
         /// <summary>

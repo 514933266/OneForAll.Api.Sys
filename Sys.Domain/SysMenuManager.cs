@@ -108,13 +108,11 @@ namespace Sys.Domain
                 return BaseErrType.DataEmpty;
 
             var treeNodes = _mapper.Map<IEnumerable<SysMenu>, IEnumerable<SysMenuTreeAggr>>(menus);
-            var tree = treeNodes.ToTree<SysMenuTreeAggr, Guid>();
-
             var perms = await _permRepository.GetListByMenuAsync(mids);
 
             var newMenus = new List<SysMenu>();
             var newPerms = new List<SysPermission>();
-            Copy(id, tree, perms, newMenus, newPerms);
+            Copy(id, treeNodes, perms, newMenus, newPerms);
 
             if (newMenus.Any())
             {
@@ -128,29 +126,18 @@ namespace Sys.Domain
             return BaseErrType.Fail;
         }
 
-        public void Copy(
-            Guid parentId,
-            IEnumerable<SysMenuTreeAggr> nodes,
-            IEnumerable<SysPermission> perms,
-            List<SysMenu> newMenus,
-            List<SysPermission> newPerms)
+        public void Copy(Guid parentId, IEnumerable<SysMenu> nodes, IEnumerable<SysPermission> perms, List<SysMenu> newMenus, List<SysPermission> newPerms)
         {
 
             nodes.ForEach(e =>
             {
                 var curPerms = perms.Where(w => w.SysMenuId == e.Id).ToList();
-                var curMenu = _mapper.Map<SysMenu>(e);
 
-                curMenu.Id = Guid.NewGuid();
-                curMenu.ParentId = parentId;
-                curPerms.ForEach(perm => { perm.Id = Guid.Empty; perm.SysMenuId = curMenu.Id; });
-                newMenus.Add(curMenu);
+                e.Id = Guid.NewGuid();
+                e.ParentId = parentId;
+                curPerms.ForEach(perm => { perm.Id = Guid.Empty; perm.SysMenuId = e.Id; });
+                newMenus.Add(e);
                 newPerms.AddRange(curPerms);
-
-                if (e.Children.Any())
-                {
-                    Copy(curMenu.Id, e.Children, perms, newMenus, newPerms);
-                }
             });
         }
 

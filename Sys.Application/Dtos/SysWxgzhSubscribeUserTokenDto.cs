@@ -10,7 +10,7 @@ namespace Sys.Application.Dtos
     /// <summary>
     /// 微信关注用户
     /// </summary>
-    public class SysWxgzhNotifyUserDto
+    public class SysWxgzhSubscribeUserTokenDto
     {
         public Guid Id { get; set; }
 

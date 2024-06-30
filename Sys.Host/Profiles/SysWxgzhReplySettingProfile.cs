@@ -15,8 +15,8 @@ namespace Sys.Host.Profiles
         public SysWxgzhReplySettingProfile()
         {
             CreateMap<SysWxgzhReplySetting, SysWxgzhReplySettingDto>();
-            CreateMap<SysWxgzhReplySettingAggr, SysWxgzhReplySettingDto>()
-                .ForMember(t => t.Contents, a => a.MapFrom(s => s.ContentJson.FromJson<List<SysWxgzhReplySettingContentVo>>()));
+            CreateMap<SysWxgzhReplySetting, SysWxgzhReplySettingAggr>();
+            CreateMap<SysWxgzhReplySettingAggr, SysWxgzhReplySettingDto>();
 
             CreateMap<SysWxgzhReplySettingForm, SysWxgzhReplySetting>()
                 .ForMember(t => t.ContentJson, a => a.MapFrom(s => s.Contents.ToJson()));

@@ -136,9 +136,11 @@ namespace Sys.Domain
         public async Task<BaseErrType> UpdateAsync(SysTenantForm entity)
         {
             var data = await _repository.GetByNameAsync(entity.Name);
-            if (data != null && data.Id != entity.Id) return BaseErrType.DataExist;
+            if (data != null && data.Id != entity.Id) 
+                return BaseErrType.DataExist;
             data = await _repository.GetByCodeAsync(entity.Code);
-            if (data != null && data.Id != entity.Id) return BaseErrType.DataExist;
+            if (data != null && data.Id != entity.Id) 
+                return BaseErrType.DataExist;
 
             data = await _repository.FindAsync(entity.Id);
             data.MapFrom(entity);
@@ -267,37 +269,26 @@ namespace Sys.Domain
         /// 添加权限
         /// </summary>
         /// <param name="id">租户id</param>
-        /// <param name="forms">权限表单</param>
+        /// <param name="pids">权限id</param>
         /// <returns>结果</returns>
 
-        public async Task<BaseErrType> AddPermissionAsync(Guid id, IEnumerable<SysMenuPermissionForm> forms)
+        public async Task<BaseErrType> AddPermissionAsync(Guid id, IEnumerable<Guid> pids)
         {
-            if (!forms.Any())
-                return BaseErrType.DataEmpty;
+            if (!pids.Any()) return BaseErrType.DataEmpty;
             var data = await _repository.FindAsync(id);
-            if (data == null)
-                return BaseErrType.DataNotFound;
+            if (data == null) return BaseErrType.DataNotFound;
 
-            // 查出所有上级菜单的EnterView权限加入到选择中
-            var menus = await _menuRepository.GetListAsync();
-            var permissions = _mapper.Map<IEnumerable<SysMenuPermissionForm>, IEnumerable<SysPermission>>(forms);
-            var ids = permissions.Select(s => new { s.Id, s.SysMenuId }).ToList();
-            var mids = ids.Select(s => s.SysMenuId).ToList();
-            var permMenus = FindAllMenus(mids, menus).DistinctBy(d => d.Id);
-            mids = permMenus.Select(s => s.Id).ToList();
-            var perms = await _permRepository.GetListByMenuAsync(mids);
-            perms = permissions.Union(perms).DistinctBy(w => w.Id).ToList();
-
+            var permissions = await _permRepository.GetListAsync(pids);
             var users = await _userRepository.GetListDefaultByTenantAsync(id);
             var tenantPerms = await _tenantPermRepository.GetListByTenantAsync(id);
             var userPerms = await _userPermRepository.GetListByTenantAsync(id);
 
             var addUserList = new List<SysUserPermContact>();
-            var addList = perms.Select(s => new SysTenantPermContact() { SysTenantId = id, SysPermissionId = s.Id }).ToList();
+            var addList = permissions.Select(s => new SysTenantPermContact() { SysTenantId = id, SysPermissionId = s.Id }).ToList();
 
             users.ForEach(e =>
             {
-                var list = perms.Select(s => new SysUserPermContact() { SysUserId = e.Id, SysPermissionId = s.Id }).ToList();
+                var list = permissions.Select(s => new SysUserPermContact() { SysUserId = e.Id, SysPermissionId = s.Id }).ToList();
                 addUserList.AddRange(list);
             });
             using (var tran = new UnitOfWork().BeginTransaction())
@@ -315,25 +306,6 @@ namespace Sys.Domain
                     await _userPermRepository.AddRangeAsync(addUserList, tran);
                 return await ResultAsync(tran.CommitAsync);
             }
-        }
-
-        // 从下至上查找所有父级菜单
-        private IEnumerable<SysMenu> FindAllMenus(IEnumerable<Guid> targetIds, IEnumerable<SysMenu> sources)
-        {
-            var result = new List<SysMenu>();
-            var data = sources.Where(w => targetIds.Contains(w.Id)).ToList();
-            if (data.Any())
-            {
-                result.AddRange(data);
-                var pids = data.Select(s => s.ParentId).ToList();
-                if (pids.Any())
-                {
-                    var parents = FindAllMenus(pids, sources);
-                    if (parents.Any())
-                        result.AddRange(parents);
-                }
-            }
-            return result;
         }
         #endregion
     }

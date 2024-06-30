@@ -36,7 +36,6 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysContactUsDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key)
         {
             return await _permService.GetPageAsync(pageIndex, pageSize, key);

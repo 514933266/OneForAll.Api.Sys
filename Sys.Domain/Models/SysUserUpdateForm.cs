@@ -16,6 +16,12 @@ namespace Sys.Domain.Models
         public Guid Id { get; set; }
 
         /// <summary>
+        /// 租户id
+        /// </summary>
+        [Required]
+        public Guid TenantId { get; set; }
+
+        /// <summary>
         /// 用户名
         /// </summary>
         [Required]
@@ -33,6 +39,7 @@ namespace Sys.Domain.Models
         /// 手机号码
         /// </summary>
         [StringLength(20)]
+        [RegularExpression("^1[0-9]{10}$", ErrorMessage = "手机号码格式错误")]
         public string Mobile { get; set; }
 
         /// <summary>

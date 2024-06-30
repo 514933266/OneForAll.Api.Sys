@@ -166,11 +166,11 @@ namespace Sys.Application
         /// 添加权限
         /// </summary>
         /// <param name="id">租户id</param>
-        /// <param name="entities">权限表单</param>
+        /// <param name="pids">权限id</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddPermissionAsync(Guid id, IEnumerable<SysMenuPermissionForm> entities)
+        public async Task<BaseErrType> AddPermissionAsync(Guid id, IEnumerable<Guid> pids)
         {
-            return await _manager.AddPermissionAsync(id, entities);
+            return await _manager.AddPermissionAsync(id, pids);
         }
         #endregion
     }

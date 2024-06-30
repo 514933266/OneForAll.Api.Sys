@@ -33,19 +33,15 @@ namespace Sys.Repository
         /// <param name="pageSize">页数</param>
         /// <param name="appId">所属微信应用id</param>
         /// <returns>分页列表</returns>
-        public async Task<PageList<SysWxgzhReplySettingAggr>> GetPageAsync(int pageIndex, int pageSize, string appId)
+        public async Task<PageList<SysWxgzhReplySetting>> GetPageAsync(int pageIndex, int pageSize, string appId)
         {
             var predicate = PredicateBuilder.Create<SysWxgzhReplySetting>(w => true);
             if (!appId.IsNullOrEmpty())
                 predicate = predicate.And(w => w.AppId == appId);
-
-            var clientDbSet = Context.Set<SysWxClient>();
             var total = await DbSet.CountAsync(predicate);
 
             var query = (from setting in DbSet.Where(predicate)
-                         join client in clientDbSet on setting.AppId equals client.AppId into leftJoinClient
-                         from lfClient in leftJoinClient.DefaultIfEmpty()
-                         select new SysWxgzhReplySettingAggr()
+                         select new SysWxgzhReplySetting()
                          {
                              Id = setting.Id,
                              AppId = setting.AppId,
@@ -56,7 +52,7 @@ namespace Sys.Repository
                          });
 
             var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
-            return new PageList<SysWxgzhReplySettingAggr>(total, pageSize, pageIndex, data);
+            return new PageList<SysWxgzhReplySetting>(total, pageSize, pageIndex, data);
         }
     }
 }

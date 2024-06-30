@@ -21,6 +21,13 @@ namespace Sys.Domain.Repositorys
         Task<IEnumerable<SysWxClientAggr>> GetListWithClientAsync();
 
         /// <summary>
+        /// 查询指定appId对应的微信客户端信息
+        /// </summary>
+        /// <param name="appIds">微信appId</param>
+        /// <returns>系统用户</returns>
+        Task<IEnumerable<SysWxClientAggr>> GetListByAppIdAsync(List<string> appIds);
+
+        /// <summary>
         /// 查询指定客户端对应的微信客户端信息
         /// </summary>
         /// <param name="clientId">系统客户端</param>

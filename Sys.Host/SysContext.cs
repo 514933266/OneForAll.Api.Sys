@@ -133,6 +133,7 @@ namespace Sys.Host
             {
                 entity.ToTable("Sys_User");
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.HasIndex(b => b.UserName).IsUnique();
             });
 
             modelBuilder.Entity<SysClient>(entity =>

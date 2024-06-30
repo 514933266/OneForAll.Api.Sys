@@ -41,7 +41,6 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysNotificationDto>> GetPageAsync(
             int pageIndex,
             int pageSize,

@@ -33,7 +33,6 @@ namespace Sys.Host.Controllers
         /// </summary>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysAreaDto>> GetPageAsync(int pageIndex, int pageSize, [FromQuery] string key, [FromQuery] int parentId = -1)
         {
             return await _areaService.GetPageAsync(pageIndex, pageSize, key, parentId);
@@ -43,7 +42,7 @@ namespace Sys.Host.Controllers
         /// 获取省份
         /// </summary>
         [HttpGet]
-        [Route("Provinces")]
+        [Route("Default/Provinces")]
         public async Task<IEnumerable<SysAreaDto>> GetProvinceAsync()
         {
             return await _areaService.GetListProvinceAsync();
@@ -63,7 +62,7 @@ namespace Sys.Host.Controllers
         /// 添加
         /// </summary>
         [HttpPost]
-        [CheckPermission(Action = ConstPermission.EnterView)]
+        [CheckPermission]
         public async Task<BaseMessage> AddAsync([FromBody] SysAreaForm entity)
         {
             var msg = new BaseMessage();
@@ -82,7 +81,7 @@ namespace Sys.Host.Controllers
         /// 修改
         /// </summary>
         [HttpPut]
-        [CheckPermission(Action = ConstPermission.EnterView)]
+        [CheckPermission]
         public async Task<BaseMessage> UpdateAsync([FromBody] SysAreaForm entity)
         {
 
@@ -105,7 +104,7 @@ namespace Sys.Host.Controllers
         /// <returns>消息</returns>
         [HttpPatch]
         [Route("Batch/IsDeleted")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
+        [CheckPermission]
         public async Task<BaseMessage> DeleteAsync([FromBody] IEnumerable<int> ids)
         {
             var msg = new BaseMessage();

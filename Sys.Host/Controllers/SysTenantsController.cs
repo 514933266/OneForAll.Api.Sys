@@ -41,7 +41,6 @@ namespace Sys.Host.Controllers
         /// <returns>租户</returns>
         [HttpGet]
         [Route("{id}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<SysTenantDto> GetAsync(Guid id)
         {
             return await _service.GetAsync(id);
@@ -71,7 +70,6 @@ namespace Sys.Host.Controllers
         /// <returns>租户列表</returns>
         [HttpGet]
         [Route("{pageIndex}/{pageSize}")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<PageList<SysTenantDto>> GetPageAsync(
             int pageIndex,
             int pageSize,
@@ -142,7 +140,7 @@ namespace Sys.Host.Controllers
         }
 
         /// <summary>
-        /// 上传封面
+        /// 上传封Logo
         /// </summary>
         /// <param name="id">项目id</param>
         /// <param name="form">文件表单</param>
@@ -209,21 +207,21 @@ namespace Sys.Host.Controllers
         /// 添加权限
         /// </summary>
         /// <param name="id">租户id</param>
-        /// <param name="entities">权限表单</param>
+        /// <param name="pids">权限id</param>
         /// <returns>结果</returns>
         [HttpPost]
         [Route("{id}/Permissions")]
         [CheckPermission(Action = ConstPermission.Update)]
-        public async Task<BaseMessage> AddPermissionAsync(Guid id, [FromBody] IEnumerable<SysMenuPermissionForm> entities)
+        public async Task<BaseMessage> AddPermissionAsync(Guid id, [FromBody] IEnumerable<Guid> pids)
         {
             var msg = new BaseMessage();
-            var errType = await _service.AddPermissionAsync(id, entities);
+            var errType = await _service.AddPermissionAsync(id, pids);
 
             switch (errType)
             {
                 case BaseErrType.Success: return msg.Success("操作成功");
                 case BaseErrType.DataNotFound: return msg.Fail("租户不存在");
-                case BaseErrType.DataEmpty: return msg.Fail("请选择要开通的服务内容");
+                case BaseErrType.DataEmpty: return msg.Fail("请选择要绑定的权限");
                 default: return msg.Fail("操作失败");
             }
         }

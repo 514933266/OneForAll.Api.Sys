@@ -40,9 +40,13 @@ namespace Sys.Application.Dtos
         public SysWxgzhReplyTypeEnum ReplyType { get; set; }
 
         /// <summary>
-        /// 内容
+        /// 内容的xml模板
         /// </summary>
-        public List<SysWxgzhReplySettingContentVo> Contents { get; set; } = new List<SysWxgzhReplySettingContentVo>();
+        public string XmlContent { get; set; }
 
+        /// <summary>
+        /// 内容json
+        /// </summary>
+        public string ContentJson { get; set; }
     }
 }

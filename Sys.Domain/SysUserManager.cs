@@ -58,21 +58,50 @@ namespace Sys.Domain
         /// </summary>
         /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> AddAsync(SysUserForm form)
+        public async Task<BaseMessage> AddAsync(SysUserForm form)
         {
-            if (form.Password != form.RePassword) return BaseErrType.DataNotMatch;
-            var data = await _userRepository.GetAsync(form.UserName);
-            if (data != null) return BaseErrType.DataExist;
-            var tenant = await _tenantRepository.FindAsync(form.TenantId);
-            if (tenant == null) return BaseErrType.DataError;
+            var msg = new BaseMessage();
 
+            #region 校验
+
+            if (form.Password != form.RePassword)
+                return msg.Fail(BaseErrType.DataNotMatch, "两次密码输入不一致");
+            var tenant = await _tenantRepository.FindAsync(form.TenantId);
+            if (tenant == null)
+                return msg.Fail(BaseErrType.DataError, "请先选择租户");
+            var data = await _userRepository.GetAsync(form.UserName);
+            if (data != null)
+            {
+                msg.Data = data.Id;// 返回id以便部分业务场景使用
+                return msg.Fail(BaseErrType.DataExist, "账号已存在");
+            }
+            #endregion
 
             data = _mapper.Map<SysUserForm, SysUser>(form);
+
+            // 默认密码
             if (data.Password.IsNullOrEmpty())
                 data.Password = data.UserName.ToMd5();
-            if (form.UserName.IsMobile() && form.Mobile.IsNullOrEmpty())
-                form.Mobile = form.UserName;
-            return await ResultAsync(() => _userRepository.AddAsync(data));
+
+            // 默认手机
+            if (data.UserName.IsMobile() && data.Mobile.IsNullOrEmpty())
+                data.Mobile = data.UserName;
+
+            // 检测手机号是否被使用
+            if (!form.Mobile.IsNullOrEmpty())
+            {
+                var exists = await _userRepository.GetAsync(w => w.Mobile == form.Mobile);
+                if (exists != null)
+                {
+                    msg.Data = exists.Id;
+                    return msg.Fail(BaseErrType.DataExist, "手机号码已被使用");
+                }
+            }
+
+            var effected = await _userRepository.AddAsync(data);
+            msg.Data = data.Id;
+
+            return effected > 0 ? msg.Success("添加账号成功") : msg.Fail("添加账号失败");
         }
 
         /// <summary>
@@ -80,29 +109,36 @@ namespace Sys.Domain
         /// </summary>
         /// <param name="form">用户</param>
         /// <returns>结果</returns>
-        public async Task<BaseErrType> UpdateAsync(SysUserUpdateForm form)
+        public async Task<BaseMessage> UpdateAsync(SysUserUpdateForm form)
         {
+            var msg = new BaseMessage();
             var data = await _userRepository.GetAsync(form.UserName);
-            if (data != null)
-            {
-                if (data.Id != form.Id)
-                    return BaseErrType.DataExist;
-            }
-            else
-            {
+            if (data != null && data.Id != form.Id)
+                return msg.Fail(BaseErrType.DataExist, "账号已被使用");
+
+            if (data == null)
                 data = await _userRepository.FindAsync(form.Id);
-                if (data == null)
-                    return BaseErrType.DataNotFound;
+            if (data == null)
+                return msg.Fail(BaseErrType.DataError, "账号不存在");
+
+            // 检测手机号是否被使用
+            if (!form.Mobile.IsNullOrEmpty())
+            {
+                var exists = await _userRepository.GetAsync(w => w.Mobile == form.Mobile);
+                if (exists != null && exists.Id != data.Id)
+                    return msg.Fail(BaseErrType.DataExist, "手机号码已被使用");
             }
 
+            // 取消默认账号时清空个人权限
             if (data.IsDefault && !form.IsDefault)
             {
-                // 取消默认账号时清空个人权限
                 var perms = await _userPermRepository.GetListAsync(w => w.SysUserId == data.Id);
                 await _userPermRepository.DeleteRangeAsync(perms);
             }
+
             _mapper.Map(form, data);
-            return await ResultAsync(_userRepository.SaveChangesAsync);
+            var effected = await _userRepository.SaveChangesAsync();
+            return effected > 0 ? msg.Success("修改账号成功") : msg.Fail("修改账号失败");
         }
 
         /// <summary>

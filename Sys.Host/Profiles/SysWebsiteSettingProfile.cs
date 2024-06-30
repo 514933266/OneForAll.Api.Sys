@@ -14,6 +14,7 @@ namespace Sys.Host.Profiles
         public SysWebsiteSettingProfile()
         {
             CreateMap<SysWebsiteSetting, SysWebsiteSettingDto>();
+            CreateMap<SysWebsiteSetting, SysWebsiteSettingAggr>();
             CreateMap<SysWebsiteSettingAggr, SysWebsiteSettingDto>()
                 .ForMember(t => t.Apis, a => a.MapFrom(s => s.SysWebsiteApiSettings));
 

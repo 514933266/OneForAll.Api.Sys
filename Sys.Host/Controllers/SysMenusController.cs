@@ -37,7 +37,6 @@ namespace Sys.Host.Controllers
         /// <param name="key"></param>
         /// <returns>菜单树</returns>
         [HttpGet]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<IEnumerable<SysMenuTreeDto>> GetListAsync(
             [FromQuery] bool hasPerms = false,
             [FromQuery] Guid? parentId = null,
@@ -188,7 +187,6 @@ namespace Sys.Host.Controllers
         /// <returns>权限列表</returns>
         [HttpGet]
         [Route("{id}/Permissions")]
-        [CheckPermission(Action = ConstPermission.EnterView)]
         public async Task<IEnumerable<SysMenuPermissionDto>> GetListPermissionAsync(Guid id)
         {
             return await _menuService.GetListPermissionAsync(id);

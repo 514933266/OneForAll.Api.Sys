@@ -21,12 +21,15 @@ namespace Sys.Domain
     {
         private readonly IMapper _mapper;
         private readonly ISysWxgzhReplySettingRepository _repository;
+        private readonly ISysWxClientRepository _clientRepository;
         public SysWxgzhReplySettingManager(
             IMapper mapper,
-            ISysWxgzhReplySettingRepository repository)
+            ISysWxgzhReplySettingRepository repository,
+            ISysWxClientRepository clientRepository)
         {
             _mapper = mapper;
             _repository = repository;
+            _clientRepository = clientRepository;
         }
 
         /// <summary>
@@ -41,7 +44,22 @@ namespace Sys.Domain
             if (pageIndex < 1) pageIndex = 1;
             if (pageSize < 1) pageSize = 10;
             if (pageSize > 100) pageSize = 100;
-            return await _repository.GetPageAsync(pageIndex, pageSize, appId);
+            var data = await _repository.GetPageAsync(pageIndex, pageSize, appId);
+            var items = _mapper.Map<IEnumerable<SysWxgzhReplySetting>, IEnumerable<SysWxgzhReplySettingAggr>>(data.Items);
+            var appIds = data.Items.Select(s => s.AppId).ToList();
+            if (appIds.Any())
+            {
+                var clients = await _clientRepository.GetListByAppIdAsync(appIds);
+                foreach (var item in items)
+                {
+                    var client = clients.FirstOrDefault(w => w.AppId == item.AppId);
+                    if (client != null)
+                    {
+                        item.ClientName = client.SysClient.ClientName;
+                    }
+                }
+            }
+            return new PageList<SysWxgzhReplySettingAggr>(data.Total, data.PageSize, data.PageIndex, items);
         }
 
         /// <summary>
