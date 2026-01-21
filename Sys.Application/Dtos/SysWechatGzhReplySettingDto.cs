@@ -1,0 +1,52 @@
+﻿using Sys.Domain.Enums;
+using Sys.Domain.ValueObjects;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sys.Application.Dtos
+{
+    /// <summary>
+    /// 微信公众号消息回复
+    /// </summary>
+    public class SysWechatGzhReplySettingDto
+    {
+        /// <summary>
+        /// 数据id
+        /// </summary>
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// 应用id
+        /// </summary>
+        public string AppId { get; set; }
+
+        /// <summary>
+        /// 所属公众号名称
+        /// </summary>
+        public string ClientName { get; set; }
+
+        /// <summary>
+        /// 消息类型
+        /// </summary>
+        public SysWechatGzhMsgTypeEnum MsgType { get; set; }
+
+        /// <summary>
+        /// 消息类型
+        /// </summary>
+        public SysWechatGzhReplyTypeEnum ReplyType { get; set; }
+
+        /// <summary>
+        /// 内容的xml模板
+        /// </summary>
+        public string XmlContent { get; set; }
+
+        /// <summary>
+        /// 内容json
+        /// </summary>
+        public string ContentJson { get; set; }
+    }
+}

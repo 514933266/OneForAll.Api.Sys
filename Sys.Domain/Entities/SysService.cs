@@ -1,0 +1,79 @@
+﻿using OneForAll.Core.ORM;
+using Sys.Domain.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sys.Domain.Entities
+{
+    /// <summary>
+    /// 系统服务
+    /// </summary>
+    public class SysService
+    {
+        /// <summary>
+        /// 实体id
+        /// </summary>
+        [Key]
+        [Required]
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// 服务代码(唯一)
+        /// </summary>
+        [Required]
+        [Unique]
+        [StringLength(50)]
+        public string Code { get; set; }
+
+        /// <summary>
+        /// 服务名称
+        /// </summary>
+        [Required]
+        [StringLength(200)]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 服务类型
+        /// </summary>
+        [Required]
+        public SysServiceEnum Type { get; set; }
+
+        /// <summary>
+        /// 服务内容
+        /// </summary>
+        [Required]
+        [StringLength(500)]
+        public string Content { get; set; }
+
+        /// <summary>
+        /// 单价
+        /// </summary>
+        [Required]
+        [Column(TypeName = "decimal(18,3)")]
+        public decimal UnitPrice { get; set; }
+
+        /// <summary>
+        /// 价格模式
+        /// </summary>
+        [Required]
+        public SysPriceModeEnum PriceMode { get; set; }
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        [Required]
+        public bool IsEnabled { get; set; } = true;
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        [Required]
+        [Column(TypeName = "datetime")]
+        public DateTime CreateTime { get; set; }
+    }
+}

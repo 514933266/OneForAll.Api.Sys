@@ -1,0 +1,48 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using OneForAll.Core.OAuth;
+using Sys.Application.Dtos;
+using Sys.Application.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Sys.Host.Controllers
+{
+    /// <summary>
+    /// 租户（租户）
+    /// </summary>
+    [Route("api/[controller]")]
+    [Authorize(Roles = UserRoleType.Ruler)]
+    public class SysTenantSelectionsController : BaseController
+    {
+        private readonly ISysTenantSelectionService _service;
+
+        public SysTenantSelectionsController(ISysTenantSelectionService service)
+        {
+            _service = service;
+        }
+
+        /// <summary>
+        /// 获取租户下拉列表
+        /// </summary>
+        /// <returns>租户列表</returns>
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<SysTenantSelectionDto> GetAsync(Guid id)
+        {
+            return await _service.GetAsync(id);
+        }
+
+        /// <summary>
+        /// 获取租户下拉列表
+        /// </summary>
+        /// <param name="key">关键字</param>
+        /// <returns>租户列表</returns>
+        [HttpGet]
+        public async Task<IEnumerable<SysTenantSelectionDto>> GetListAsync([FromQuery] string key)
+        {
+            return await _service.GetListAsync(key);
+        }
+    }
+}

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>7.1</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="OneForAll.Core" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sys.Domain\Sys.Domain.csproj" />
+    <ProjectReference Include="..\Sys.HttpService\Sys.HttpService.csproj" />
+    <ProjectReference Include="..\Sys.Public\Sys.Public.csproj" />
+    <ProjectReference Include="..\Sys.Repository\Sys.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
