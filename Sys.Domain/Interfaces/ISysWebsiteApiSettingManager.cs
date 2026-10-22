@@ -10,17 +10,10 @@ using System.Threading.Tasks;
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 网站设置-Api
+    /// 网站设置-Api（命令）
     /// </summary>
     public interface ISysWebsiteApiSettingManager
     {
-        /// <summary>
-        /// 获取列表
-        /// </summary>
-        /// <param name="settingId">设置id</param>
-        /// <returns>列表</returns>
-        Task<IEnumerable<SysWebsiteApiSetting>> GetListAsync(Guid settingId);
-
         /// <summary>
         /// 添加
         /// </summary>

@@ -25,5 +25,12 @@ namespace Sys.Domain.Repositorys
         /// <param name="ids">实体id</param>
         /// <returns>列表</returns>
         Task<IEnumerable<SysMenu>> GetListAsync(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// 查询上级菜单的子菜单列表
+        /// </summary>
+        /// <param name="parentId">上级菜单id</param>
+        /// <returns>列表</returns>
+        Task<IEnumerable<SysMenu>> GetListByParentIdAsync(Guid parentId);
     }
 }

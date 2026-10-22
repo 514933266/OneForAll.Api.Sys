@@ -26,6 +26,13 @@ namespace Sys.Domain.Repositorys
         /// <param name="tenantId">租户id</param>
         /// <returns>租户列表</returns>
         Task<IEnumerable<SysMidRoleUser>> GetListByTenantAsync(Guid tenantId);
+
+        /// <summary>
+        /// 查询角色成员列表
+        /// </summary>
+        /// <param name="roleId">角色id</param>
+        /// <returns>角色用户列表</returns>
+        Task<IEnumerable<SysMidRoleUser>> GetListByRoleAsync(Guid roleId);
     }
 }
 

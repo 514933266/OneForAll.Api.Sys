@@ -59,5 +59,35 @@ namespace Sys.Domain.Repositorys
         /// <param name="username">用户名</param>
         /// <returns>用户</returns>
         Task<SysUser> GetAsync(string username);
+
+        /// <summary>
+        /// 查询实体（手机号）
+        /// </summary>
+        /// <param name="mobile">手机号</param>
+        /// <returns>用户</returns>
+        Task<SysUser> GetByMobileAsync(string mobile);
+
+        /// <summary>
+        /// 查询实体（租户+手机号）
+        /// </summary>
+        /// <param name="tenantId">租户id</param>
+        /// <param name="mobile">手机号</param>
+        /// <returns>用户</returns>
+        Task<SysUser> GetByTenantAndMobileAsync(Guid tenantId, string mobile);
+
+        /// <summary>
+        /// 查询实体（租户+id）
+        /// </summary>
+        /// <param name="tenantId">租户id</param>
+        /// <param name="id">用户id</param>
+        /// <returns>用户</returns>
+        Task<SysUser> GetByTenantAndIdAsync(Guid tenantId, Guid id);
+
+        /// <summary>
+        /// 查询未包含指定id的用户列表
+        /// </summary>
+        /// <param name="ids">排除的用户id</param>
+        /// <returns>用户列表</returns>
+        Task<IEnumerable<SysUser>> GetListNotInIdsAsync(IEnumerable<Guid> ids);
     }
 }

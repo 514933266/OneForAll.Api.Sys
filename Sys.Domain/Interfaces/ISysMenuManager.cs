@@ -15,15 +15,6 @@ namespace Sys.Domain.Interfaces
     public interface ISysMenuManager
     {
         /// <summary>
-        /// 获取列表
-        /// </summary>
-        /// <param name="hasPerms">是否包含权限</param>
-        /// <param name="parentId">上级节点</param>
-        /// <param name="key">关键字</param>
-        /// <returns>列表</returns>
-        Task<IEnumerable<SysMenuPermissionAggr>> GetListAsync(bool hasPerms, Guid parentId, string key);
-
-        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="entity">实体</param>

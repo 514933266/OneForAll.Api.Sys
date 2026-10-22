@@ -18,13 +18,16 @@ namespace Sys.HttpService
     public class SysGlobalExceptionLogHttpService : BaseHttpService, ISysGlobalExceptionLogHttpService
     {
         private readonly HttpServiceConfig _config;
+        private readonly HttpServiceLogConfig _logConfig;
 
         public SysGlobalExceptionLogHttpService(
             HttpServiceConfig config,
+            HttpServiceLogConfig logConfig,
             IHttpContextAccessor httpContext,
             IHttpClientFactory httpClientFactory) : base(httpContext, httpClientFactory)
         {
             _config = config;
+            _logConfig = logConfig;
         }
 
         /// <summary>
@@ -34,12 +37,23 @@ namespace Sys.HttpService
         /// <returns></returns>
         public async Task AddAsync(SysGlobalExceptionLogRequest form)
         {
-            form.CreateTime = DateTime.UtcNow;
+            // 检查是否启用日志
+            if (!_logConfig.GlobalExceptionLog)
+                return;
 
-            var client = GetHttpClient(_config.SysLog);
-            if (client != null && client.BaseAddress != null)
+            try
             {
-                await client.PostAsync("api/SysGlobalExceptionLogs", form, new JsonMediaTypeFormatter());
+                form.CreateTime = DateTime.Now;
+
+                var client = GetHttpClient(_config.SysLog);
+                if (client != null && client.BaseAddress != null)
+                {
+                    await client.PostAsync("api/SysGlobalExceptionLogs", form, new JsonMediaTypeFormatter());
+                }
+            }
+            catch
+            {
+                // 忽略异常
             }
         }
     }

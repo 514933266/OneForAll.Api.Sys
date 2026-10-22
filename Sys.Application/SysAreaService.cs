@@ -21,13 +21,16 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysAreaManager _areaManageer;
+        private readonly ISysAreaQueryService _query;
 
         public SysAreaService(
             IMapper mapper,
-            ISysAreaManager areaManageer)
+            ISysAreaManager areaManageer,
+            ISysAreaQueryService query)
         {
             _mapper = mapper;
             _areaManageer = areaManageer;
+            _query = query;
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace Sys.Application
         /// <returns>分页列表</returns>
         public async Task<PageList<SysAreaDto>> GetPageAsync(int pageIndex, int pageSize, string key, int parentId)
         {
-            var data= await _areaManageer.GetPageAsync(pageIndex, pageSize, key, parentId);
+            var data= await _query.GetPageAsync(pageIndex, pageSize, key, parentId);
             var items = _mapper.Map<IEnumerable<SysArea>, IEnumerable<SysAreaDto>>(data.Items);
             return new PageList<SysAreaDto>(data.Total, data.PageSize, data.PageIndex, items);
         }
@@ -51,7 +54,7 @@ namespace Sys.Application
         /// <returns>列表</returns>
         public async Task<IEnumerable<SysAreaDto>> GetListProvinceAsync()
         {
-            var data = await _areaManageer.GetChildrenAsync(0);
+            var data = await _query.GetChildrenAsync(0);
             return _mapper.Map<IEnumerable<SysArea>, IEnumerable<SysAreaDto>>(data);
         }
 
@@ -62,7 +65,7 @@ namespace Sys.Application
         /// <returns>列表</returns>
         public async Task<IEnumerable<SysAreaDto>> GetChildrenAsync(int parentId)
         {
-            var data = await _areaManageer.GetChildrenAsync(parentId);
+            var data = await _query.GetChildrenAsync(parentId);
             return _mapper.Map<IEnumerable<SysArea>, IEnumerable<SysAreaDto>>(data);
         }
 

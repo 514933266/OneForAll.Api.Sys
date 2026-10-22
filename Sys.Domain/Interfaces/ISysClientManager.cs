@@ -10,16 +10,10 @@ using System.Threading.Tasks;
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 微信客户端
+    /// 系统客户端（命令）
     /// </summary>
     public interface ISysClientManager
     {
-        /// <summary>
-        /// 获取列表
-        /// </summary>
-        /// <returns>列表</returns>
-        Task<IEnumerable<SysClient>> GetListAsync();
-
         /// <summary>
         /// 添加
         /// </summary>

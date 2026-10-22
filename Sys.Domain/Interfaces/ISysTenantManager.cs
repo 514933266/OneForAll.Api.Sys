@@ -20,31 +20,6 @@ namespace Sys.Domain.Interfaces
         #region 租户
 
         /// <summary>
-        /// 获取租户
-        /// </summary>
-        /// <param name="id">租户id</param>
-        /// <returns>租户</returns>
-        Task<SysTenant> GetAsync(Guid id);
-
-        /// <summary>
-        /// 获取分页
-        /// </summary>
-        /// <param name="pageIndex">页码</param>
-        /// <param name="pageSize">页数</param>
-        /// <param name="key">关键字</param>
-        /// <param name="isEnabled">合作状态（0未合作，1合作中）</param>
-        /// <param name="startDate">注册开始时间</param>
-        /// <param name="endDate">注册结束时间</param>
-        /// <returns>租户列表</returns>
-        Task<PageList<SysTenant>> GetPageAsync(
-            int pageIndex,
-            int pageSize,
-            string key,
-            SysEnabledEnum isEnabled,
-            DateTime? startDate,
-            DateTime? endDate);
-
-        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="entity">实体</param>
@@ -76,25 +51,7 @@ namespace Sys.Domain.Interfaces
 
         #endregion
 
-        #region 菜单
-
-        /// <summary>
-        /// 获取菜单权限
-        /// </summary>
-        /// <param name="id">租户id</param>
-        /// <returns>权限列表</returns>
-        Task<IEnumerable<SysMenuPermissionAggr>> GetListMenuAsync(Guid id);
-
-        #endregion
-
         #region 权限
-
-        /// <summary>
-        /// 获取权限
-        /// </summary>
-        /// <param name="id">租户id</param>
-        /// <returns>权限列表</returns>
-        Task<IEnumerable<SysPermission>> GetListPermissionAsync(Guid id);
 
         /// <summary>
         /// 添加权限

@@ -9,19 +9,10 @@ using System.Threading.Tasks;
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 领域服务：角色
+    /// 领域服务：角色（命令）
     /// </summary>
     public interface ISysRoleManager
     {
-        /// <summary>
-        /// 获取分页
-        /// </summary>
-        /// <param name="pageIndex">页码</param>
-        /// <param name="pageSize">页数</param>
-        /// <param name="key">关键字</param>
-        /// <returns>实体分页</returns>
-        Task<PageList<SysRole>> GetPageAsync(int pageIndex, int pageSize, string key);
-
         /// <summary>
         /// 添加
         /// </summary>

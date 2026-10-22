@@ -2,7 +2,6 @@
 using Sys.Application.Interfaces;
 using Sys.Domain.Interfaces;
 using Sys.Domain.Models;
-using Sys.Domain.Repositorys;
 using Sys.HttpService.Interfaces;
 using OneForAll.Core;
 using OneForAll.Core.Utility;

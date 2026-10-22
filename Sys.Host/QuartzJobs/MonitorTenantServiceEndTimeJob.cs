@@ -3,9 +3,7 @@ using Sys.Domain.Interfaces;
 using Sys.Domain.Repositorys;
 using Sys.Host.Models;
 using Sys.HttpService.Interfaces;
-using Sys.HttpService.Models;
 using System.Threading.Tasks;
-using System;
 using Sys.Repository;
 using System.Linq;
 
@@ -14,59 +12,43 @@ namespace Sys.Host.QuartzJobs
     /// <summary>
     /// 监控租户服务到期时间
     /// </summary>
-    public class MonitorTenantServiceEndTimeJob : IJob
+    public class MonitorTenantServiceEndTimeJob : BaseLockJob
     {
-        private readonly AuthConfig _config;
-        
         private readonly ISysTenantRepository _tenantRepository;
         private readonly ISysTenantServiceSettingRepository _tenantSettingRepository;
 
-        private readonly IScheduleJobHttpService _jobHttpService;
-        private readonly ISysGlobalExceptionLogHttpService _logHttpService;
-
         public MonitorTenantServiceEndTimeJob(
-            AuthConfig config,
             ISysTenantRepository tenantRepository,
             ISysTenantServiceSettingRepository tenantSettingRepository,
+            QuartzScheduleJobConfig jobConfig,
+            AuthConfig authConfig,
+            JobLockConfig lockConfig,
             IScheduleJobHttpService jobHttpService,
             ISysGlobalExceptionLogHttpService logHttpService)
+            : base(jobConfig, authConfig, lockConfig, jobHttpService, logHttpService)
         {
-            _config = config;
             _tenantRepository = tenantRepository;
             _tenantSettingRepository = tenantSettingRepository;
-
-            _jobHttpService = jobHttpService;
-            _logHttpService = logHttpService;
         }
 
-        public async Task Execute(IJobExecutionContext context)
+        /// <summary>
+        /// 执行任务
+        /// </summary>
+        protected override async Task ExecuteInternalAsync(IJobExecutionContext context)
         {
-            try
+            var effected = 0;
+            var data = await _tenantSettingRepository.GetListExpiryAsync();
+            if (data.Any())
             {
-                var effected = 0;
-                var data = await _tenantSettingRepository.GetListExpiryAsync();
-                if (data.Any())
+                var ids = data.Select(s => s.Id).ToList();
+                var tenants = await _tenantRepository.GetListAsync(ids);
+                foreach (var item in tenants)
                 {
-                    var ids = data.Select(s => s.Id).ToList();
-                    var tenants = await _tenantRepository.GetListAsync(w => ids.Contains(w.Id));
-                    foreach (var item in tenants)
-                    {
-                        item.IsEnabled = false;
-                    }
-                    effected = await _tenantRepository.SaveChangesAsync();
+                    item.IsEnabled = false;
                 }
-                await _jobHttpService.LogAsync(_config.ClientCode, typeof(MonitorTenantServiceEndTimeJob).Name, $"监控租户服务到期时间任务执行完成，共有{effected}个租户服务到期");
+                effected = await _tenantRepository.SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                await _logHttpService.AddAsync(new SysGlobalExceptionLogRequest
-                {
-                    ModuleName = _config.ClientName,
-                    ModuleCode = _config.ClientCode,
-                    Name = ex.Message,
-                    Content = ex.InnerException == null ? ex.StackTrace : ex.InnerException.StackTrace
-                });
-            }
+            await AddLogAsync($"监控租户服务到期时间任务执行完成，共有{effected}个租户服务到期");
         }
     }
 }

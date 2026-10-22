@@ -1,4 +1,6 @@
 ﻿using Sys.Domain.Enums;
+using OneForAll.Core.Extension;
+using OneForAll.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -110,5 +112,24 @@ namespace Sys.Domain.Entities
         [Required]
         [Column(TypeName = "datetime")]
         public DateTime CreateTime { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// 应用默认密码（聚合行为）：密码为空时以账号的 MD5 作为初始密码，
+        /// 保证“密码字段必非空且已哈希”这一领域不变式。
+        /// </summary>
+        public void ApplyDefaultPassword()
+        {
+            if (Password.IsNullOrEmpty())
+                Password = UserName.ToMd5();
+        }
+
+        /// <summary>
+        /// 由账号回填手机号（聚合行为）：账号为手机号且手机号为空时，将账号同步为手机号。
+        /// </summary>
+        public void SyncMobileFromUserName()
+        {
+            if (UserName.IsMobile() && Mobile.IsNullOrEmpty())
+                Mobile = UserName;
+        }
     }
 }

@@ -17,22 +17,6 @@ namespace Sys.Domain.Interfaces
     public interface ISysNotificationManager
     {
         /// <summary>
-        /// 获取分页
-        /// </summary>
-        /// <param name="pageIndex">页码</param>
-        /// <param name="pageSize">页数</param>
-        /// <param name="key">关键字</param>
-        /// <param name="startDate">开始时间</param>
-        /// <param name="endDate">结束时间</param>
-        /// <returns>分页列表</returns>
-        Task<PageList<SysNotification>> GetPageAsync(
-            int pageIndex,
-            int pageSize,
-            string key,
-            DateTime? startDate,
-            DateTime? endDate);
-
-        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="form">表单</param>

@@ -12,16 +12,10 @@ using System.Threading.Tasks;
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 微信客户端
+    /// 微信客户端（命令）
     /// </summary>
     public interface ISysWechatClientManager
     {
-        /// <summary>
-        /// 获取列表
-        /// </summary>
-        /// <returns>列表</returns>
-        Task<IEnumerable<SysWechatClientAggr>> GetListAsync();
-
         /// <summary>
         /// 添加
         /// </summary>

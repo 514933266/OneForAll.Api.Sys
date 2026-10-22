@@ -46,5 +46,15 @@ namespace Sys.Repository
                           join contact in DbSet on role.Id equals contact.SysRoleId
                           select contact).ToListAsync();
         }
+
+        /// <summary>
+        /// 查询角色权限列表
+        /// </summary>
+        /// <param name="roleId">角色id</param>
+        /// <returns>角色权限列表</returns>
+        public async Task<IEnumerable<SysMidRolePermission>> GetListByRoleAsync(Guid roleId)
+        {
+            return await DbSet.Where(w => w.SysRoleId == roleId).ToListAsync();
+        }
     }
 }

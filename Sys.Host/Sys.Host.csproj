@@ -46,6 +46,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="Autofac.Extras.DynamicProxy" Version="7.1.0" />
     <PackageReference Include="AutoMapper" Version="16.0.0" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />
@@ -56,6 +57,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Quartz" Version="3.15.1" />
+    <PackageReference Include="OneForAll.Core" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,9 +78,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="OneForAll.Core">
-      <HintPath>..\..\..\..\dll\netcoreapp3.0\OneForAll.Core.dll</HintPath>
-    </Reference>
     <Reference Include="OneForAll.EFCore">
       <HintPath>..\..\..\..\dll\netcoreapp3.0\OneForAll.EFCore.dll</HintPath>
     </Reference>

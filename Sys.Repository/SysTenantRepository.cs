@@ -105,5 +105,18 @@ namespace Sys.Repository
         {
             return await DbSet.Where(w => w.Code.Equals(code)).FirstOrDefaultAsync();
         }
+
+        /// <summary>
+        /// 按关键字查询租户列表（下拉选项）
+        /// </summary>
+        /// <param name="key">关键字</param>
+        /// <returns>租户列表</returns>
+        public async Task<IEnumerable<SysTenant>> GetListByKeyAsync(string key)
+        {
+            var predicate = PredicateBuilder.Create<SysTenant>(w => true);
+            if (!key.IsNullOrEmpty())
+                predicate = predicate.And(w => w.Name.Contains(key));
+            return await DbSet.Where(predicate).ToListAsync();
+        }
     }
 }

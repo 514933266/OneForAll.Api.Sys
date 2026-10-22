@@ -22,12 +22,15 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysContactUsManager _manager;
+        private readonly ISysContactUsQueryService _query;
         public SysContactUsService(
             IMapper mapper,
-            ISysContactUsManager manager)
+            ISysContactUsManager manager,
+            ISysContactUsQueryService query)
         {
             _mapper = mapper;
             _manager = manager;
+            _query = query;
         }
 
         /// <summary>
@@ -39,7 +42,7 @@ namespace Sys.Application
         /// <returns>分页列表</returns>
         public async Task<PageList<SysContactUsDto>> GetPageAsync(int pageIndex, int pageSize, string key)
         {
-            var data = await _manager.GetPageAsync(pageIndex, pageSize, key);
+            var data = await _query.GetPageAsync(pageIndex, pageSize, key);
             var items = _mapper.Map<IEnumerable<SysContactUs>, IEnumerable<SysContactUsDto>>(data.Items);
             return new PageList<SysContactUsDto>(data.Total, data.PageSize, data.PageIndex, items);
         }

@@ -20,13 +20,16 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysClientManager _manager;
+        private readonly ISysClientQueryService _query;
 
         public SysClientService(
             IMapper mapper,
-            ISysClientManager manager)
+            ISysClientManager manager,
+            ISysClientQueryService query)
         {
             _mapper = mapper;
             _manager = manager;
+            _query = query;
         }
 
         /// <summary>
@@ -35,7 +38,7 @@ namespace Sys.Application
         /// <returns>列表</returns>
         public async Task<IEnumerable<SysClientDto>> GetListAsync()
         {
-            var data = await _manager.GetListAsync();
+            var data = await _query.GetListAsync();
             return _mapper.Map<IEnumerable<SysClient>, IEnumerable<SysClientDto>>(data);
         }
 

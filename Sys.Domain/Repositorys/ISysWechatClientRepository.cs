@@ -33,5 +33,34 @@ namespace Sys.Domain.Repositorys
         /// <param name="clientId">系统客户端</param>
         /// <returns>系统用户</returns>
         Task<SysWechatClientAggr> GetByClientIdAsync(string clientId);
+
+        /// <summary>
+        /// 按appId查询微信客户端实体
+        /// </summary>
+        /// <param name="appId">微信appId</param>
+        /// <returns>微信客户端</returns>
+        Task<SysWechatClient> GetByAppIdAsync(string appId);
+
+        /// <summary>
+        /// 是否存在指定appId
+        /// </summary>
+        /// <param name="appId">微信appId</param>
+        /// <returns>是否存在</returns>
+        Task<bool> ExistsByAppIdAsync(string appId);
+
+        /// <summary>
+        /// 是否存在指定appId（排除自身）
+        /// </summary>
+        /// <param name="appId">微信appId</param>
+        /// <param name="excludeId">排除的实体id</param>
+        /// <returns>是否存在</returns>
+        Task<bool> ExistsByAppIdAsync(string appId, Guid excludeId);
+
+        /// <summary>
+        /// 按id集合查询列表
+        /// </summary>
+        /// <param name="ids">实体id</param>
+        /// <returns>列表</returns>
+        Task<IEnumerable<SysWechatClient>> GetListByIdsAsync(IEnumerable<Guid> ids);
     }
 }

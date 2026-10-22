@@ -6,7 +6,6 @@ using Sys.Application.Interfaces;
 using Sys.Domain.Entities;
 using Sys.Domain.Aggregates;
 using Sys.Domain.Interfaces;
-using Sys.Domain.Repositorys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +20,13 @@ namespace Sys.Application
     public class SysWechatGzhSubscriberService : ISysWechatGzhSubscriberService
     {
         private readonly IMapper _mapper;
-        private readonly ISysWechatGzhSubscriberRepository _repository;
-        private readonly ISysWechatClientRepository _clientRepository;
-        public SysWechatGzhSubscriberService(IMapper mapper, ISysWechatGzhSubscriberRepository repository, ISysWechatClientRepository clientRepository)
+        private readonly ISysWechatGzhSubscriberQueryService _subQuery;
+        private readonly ISysWechatClientQueryService _clientQuery;
+        public SysWechatGzhSubscriberService(IMapper mapper, ISysWechatGzhSubscriberQueryService subQuery, ISysWechatClientQueryService clientQuery)
         {
             _mapper = mapper;
-            _repository = repository;
-            _clientRepository = clientRepository;
+            _subQuery = subQuery;
+            _clientQuery = clientQuery;
         }
 
         /// <summary>
@@ -39,13 +38,13 @@ namespace Sys.Application
         /// <returns>用户</returns>
         public async Task<PageList<SysWechatGzhSubscriberDto>> GetPageAsync(int pageIndex, int pageSize, string key)
         {
-            var data = await _repository.GetPageAsync(pageIndex, pageSize, key);
+            var data = await _subQuery.GetPageAsync(pageIndex, pageSize, key);
 
             var items = _mapper.Map<IEnumerable<SysWechatGzhSubscriberAggr>, IEnumerable<SysWechatGzhSubscriberDto>>(data.Items);
             var appIds = data.Items.Select(s => s.AppId).ToList();
             if (appIds.Any())
             {
-                var clients = await _clientRepository.GetListByAppIdAsync(appIds);
+                var clients = await _clientQuery.GetListByAppIdAsync(appIds);
                 foreach (var item in items)
                 {
                     var client = clients.FirstOrDefault(w => w.AppId == item.AppId);
@@ -66,7 +65,7 @@ namespace Sys.Application
         /// <returns>用户</returns>
         public async Task<IEnumerable<SysWechatGzhSubscriberDto>> GetListAsync([FromBody] IEnumerable<Guid> userIds)
         {
-            var data = await _repository.GetListByUserAsync(userIds);
+            var data = await _subQuery.GetListByUserAsync(userIds);
             return _mapper.Map<IEnumerable<SysWechatGzhSubscriberAggr>, IEnumerable<SysWechatGzhSubscriberDto>>(data);
         }
 
@@ -79,10 +78,10 @@ namespace Sys.Application
         public async Task<SysWechatGzhSubscriberTokenDto> GetAsync(Guid userId, string clientId)
         {
             var result = new SysWechatGzhSubscriberTokenDto() { IsUnSubscribed = true };
-            var client = await _clientRepository.GetByClientIdAsync(clientId);
+            var client = await _clientQuery.GetByClientIdAsync(clientId);
             if (client != null)
             {
-                var data = await _repository.GetAsync(w => w.SysUserId == userId && w.AppId == client.AppId && !w.IsUnSubscribed);
+                var data = await _subQuery.GetActiveByUserAsync(userId, client.AppId);
                 if (data != null)
                 {
                     result = _mapper.Map<SysWechatGzhSubscriberTokenDto>(data);

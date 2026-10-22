@@ -120,5 +120,47 @@ namespace Sys.Repository
         {
             return await DbSet.Where(w => w.UserName == username).FirstOrDefaultAsync();
         }
+
+        /// <summary>
+        /// 查询实体（手机号）
+        /// </summary>
+        /// <param name="mobile">手机号</param>
+        /// <returns>用户</returns>
+        public async Task<SysUser> GetByMobileAsync(string mobile)
+        {
+            return await DbSet.FirstOrDefaultAsync(w => w.Mobile == mobile);
+        }
+
+        /// <summary>
+        /// 查询实体（租户+手机号）
+        /// </summary>
+        /// <param name="tenantId">租户id</param>
+        /// <param name="mobile">手机号</param>
+        /// <returns>用户</returns>
+        public async Task<SysUser> GetByTenantAndMobileAsync(Guid tenantId, string mobile)
+        {
+            return await DbSet.FirstOrDefaultAsync(w => w.SysTenantId == tenantId && w.Mobile == mobile);
+        }
+
+        /// <summary>
+        /// 查询实体（租户+id）
+        /// </summary>
+        /// <param name="tenantId">租户id</param>
+        /// <param name="id">用户id</param>
+        /// <returns>用户</returns>
+        public async Task<SysUser> GetByTenantAndIdAsync(Guid tenantId, Guid id)
+        {
+            return await DbSet.FirstOrDefaultAsync(w => w.Id == id && w.SysTenantId == tenantId);
+        }
+
+        /// <summary>
+        /// 查询未包含指定id的用户列表
+        /// </summary>
+        /// <param name="ids">排除的用户id</param>
+        /// <returns>用户列表</returns>
+        public async Task<IEnumerable<SysUser>> GetListNotInIdsAsync(IEnumerable<Guid> ids)
+        {
+            return await DbSet.Where(w => !ids.Contains(w.Id)).ToListAsync();
+        }
     }
 }

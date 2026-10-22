@@ -6,7 +6,6 @@ using Sys.Domain.Entities;
 using Sys.Domain.Aggregates;
 using Sys.Domain.Interfaces;
 using Sys.Domain.Models;
-using Sys.Domain.Repositorys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,15 +21,15 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysUserManager _manager;
-        private readonly ISysUserRepository _repository;
+        private readonly ISysUserQueryService _query;
         public SysUserService(
             IMapper mapper,
             ISysUserManager manager,
-            ISysUserRepository repository)
+            ISysUserQueryService query)
         {
             _mapper = mapper;
             _manager = manager;
-            _repository = repository;
+            _query = query;
         }
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace Sys.Application
         /// <returns>分页</returns>
         public async Task<PageList<SysUserDto>> GetPageAsync(int pageIndex, int pageSize, string key)
         {
-            var data = await _manager.GetPageAsync(pageIndex, pageSize, key);
+            var data = await _query.GetPageAsync(pageIndex, pageSize, key);
 
             var items = _mapper.Map<IEnumerable<SysUserAggr>, IEnumerable<SysUserDto>>(data.Items);
             return new PageList<SysUserDto>(data.Total, data.PageIndex, data.PageSize, items);
@@ -57,7 +56,7 @@ namespace Sys.Application
         {
             if (ids.Any())
             {
-                var data = await _repository.GetListAsync(w => ids.Contains(w.Id)) as List<SysUser>;
+                var data = await _query.GetListByIdsAsync(ids);
                 return _mapper.Map<IEnumerable<SysUser>, IEnumerable<SysUserDto>>(data);
             }
             return Enumerable.Empty<SysUserDto>();
@@ -71,7 +70,7 @@ namespace Sys.Application
         /// <returns>用户列表</returns>
         public async Task<SysUserDto> GetByMobileAsync(Guid tenantId, string mobile)
         {
-            var data = await _repository.GetAsync(w => w.SysTenantId == tenantId && w.Mobile == mobile);
+            var data = await _query.GetByMobileAsync(tenantId, mobile);
             return _mapper.Map<SysUserDto>(data);
         }
 

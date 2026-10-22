@@ -21,13 +21,16 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysWechatClientManager _manager;
+        private readonly ISysWechatClientQueryService _query;
 
         public SysWechatClientService(
             IMapper mapper,
-            ISysWechatClientManager manager)
+            ISysWechatClientManager manager,
+            ISysWechatClientQueryService query)
         {
             _mapper = mapper;
             _manager = manager;
+            _query = query;
         }
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace Sys.Application
         /// <returns>列表</returns>
         public async Task<IEnumerable<SysWechatClientDto>> GetListAsync()
         {
-            var data = await _manager.GetListAsync();
+            var data = await _query.GetListAsync();
             return _mapper.Map<IEnumerable<SysWechatClientAggr>, IEnumerable<SysWechatClientDto>>(data);
         }
 

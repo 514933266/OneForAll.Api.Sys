@@ -86,5 +86,46 @@ namespace Sys.Repository
 
             return await query.ToListAsync();
         }
+
+        /// <summary>
+        /// 按OpenId查询实体
+        /// </summary>
+        /// <param name="openId">OpenId</param>
+        /// <returns>订阅用户</returns>
+        public async Task<SysWechatGzhSubscriber> GetByOpenIdAsync(string openId)
+        {
+            return await DbSet.FirstOrDefaultAsync(w => w.OpenId == openId);
+        }
+
+        /// <summary>
+        /// 按appId与OpenId查询实体
+        /// </summary>
+        /// <param name="appId">微信appId</param>
+        /// <param name="openId">OpenId</param>
+        /// <returns>订阅用户</returns>
+        public async Task<SysWechatGzhSubscriber> GetByAppIdOpenIdAsync(string appId, string openId)
+        {
+            return await DbSet.FirstOrDefaultAsync(w => w.AppId == appId && w.OpenId == openId);
+        }
+
+        /// <summary>
+        /// 按用户与appId查询有效（未取消关注）订阅用户
+        /// </summary>
+        /// <param name="userId">用户id</param>
+        /// <param name="appId">微信appId</param>
+        /// <returns>订阅用户</returns>
+        public async Task<SysWechatGzhSubscriber> GetActiveByUserAsync(Guid userId, string appId)
+        {
+            return await DbSet.FirstOrDefaultAsync(w => w.SysUserId == userId && w.AppId == appId && !w.IsUnSubscribed);
+        }
+
+        /// <summary>
+        /// 查询未关联系统用户的订阅用户列表
+        /// </summary>
+        /// <returns>订阅用户列表</returns>
+        public async Task<IEnumerable<SysWechatGzhSubscriber>> GetListUnboundAsync()
+        {
+            return await DbSet.Where(w => w.SysUserId == Guid.Empty).ToListAsync();
+        }
     }
 }

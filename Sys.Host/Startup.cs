@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Core;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,12 +14,14 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OneForAll.Core.Extension;
+using OneForAll.Core.Events;
 using OneForAll.Core.UploadFile;
 using OneForAll.File;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
 using Sys.Host.Filters;
+using Sys.Host.Events;
 using Sys.Host.Model;
 using Sys.Host.Models;
 using Sys.Host.Providers;
@@ -38,11 +41,13 @@ namespace Sys.Host
         const string CORS = "Cors";
         const string AUTH = "Auth";
         private readonly string QUARTZ = "Quartz";
+        private readonly string JOB_LOCK = "JobLock";
         const string BASE_HOST = "Sys.Host";
         const string BASE_APPLICATION = "Sys.Application";
         const string BASE_DOMAIN = "Sys.Domain";
         const string BASE_REPOSITORY = "Sys.Repository";
         private readonly string HTTP_SERVICE_KEY = "HttpService";
+        private readonly string HTTP_SERVICELOG_KEY = "HttpServiceLog";
         private readonly string HTTP_SERVICE = "Sys.HttpService";
         public IConfiguration Configuration { get; }
 
@@ -106,6 +111,11 @@ namespace Sys.Host
             // 将 HttpServiceConfig 作为单例注入，供后续使用
             services.AddSingleton<HttpServiceConfig>();
 
+            // HTTP 服务日志开关（控制各类日志是否上报到日志服务，见 appsettings.json 的 HttpServiceLog 节）
+            var serviceLogConfig = new HttpServiceLogConfig();
+            Configuration.GetSection(HTTP_SERVICELOG_KEY).Bind(serviceLogConfig);
+            services.AddSingleton(serviceLogConfig);
+
             #endregion
 
             #region Jwt
@@ -150,6 +160,11 @@ namespace Sys.Host
             services.AddSingleton<IUploader, Uploader>();
             services.AddScoped<ITenantProvider, TenantProvider>();
 
+            // 注册 MediatR 核心（IPublisher/ISender 等）。领域事件即 INotification，
+            // 订阅者（*Handler）在 ConfigureContainer 里以 Autofac AsImplementedInterfaces 扫描注册为 INotificationHandler<T>；
+            // 此处扫描 Domain 程序集（无 MediatR 处理器，仅确保核心注册，避免与 *Handler 扫描重复注册订阅者）。
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Load(BASE_DOMAIN)));
+
             #endregion
 
             #region Mvc
@@ -177,6 +192,11 @@ namespace Sys.Host
             // 读取 Quartz 定时任务配置
             var quartzConfig = Configuration.GetSection(QUARTZ).Get<QuartzScheduleJobConfig>();
             services.AddSingleton(quartzConfig); // 注册配置为单例
+
+            // 定时任务运行锁配置（调度中心并发检查异常时是否放行执行）
+            var jobLockConfig = new JobLockConfig();
+            Configuration.GetSection(JOB_LOCK).Bind(jobLockConfig);
+            services.AddSingleton(jobLockConfig);
 
             // 注册自定义 Job 工厂和调度器工厂
             services.AddSingleton<IJobFactory, ScheduleJobFactory>();
@@ -221,9 +241,14 @@ namespace Sys.Host
                 .Where(t => t.Name.EndsWith("Service"))
                 .AsImplementedInterfaces();
 
-            // 领域层
+            // 领域层（命令：Manager）
             builder.RegisterAssemblyTypes(Assembly.Load(BASE_DOMAIN))
                 .Where(t => t.Name.EndsWith("Manager"))
+                .AsImplementedInterfaces();
+
+            // 领域层（查询：QueryService）
+            builder.RegisterAssemblyTypes(Assembly.Load(BASE_DOMAIN))
+                .Where(t => t.Name.EndsWith("QueryService"))
                 .AsImplementedInterfaces();
 
             // 仓储层
@@ -239,6 +264,15 @@ namespace Sys.Host
                .Where(t => t.Name.EndsWith("Repository"))
                .WithParameter(ResolvedParameter.ForNamed<DbContext>("SysDbContext"))
                .AsImplementedInterfaces();
+
+            // 领域事件（进程内，MediatR 实现）：
+            // - IDomainEvent/IEventDispatcher 为上收 OneForAll.Core 的纯抽象；领域事件在 Sys.Domain 中兼实现 INotification，订阅者直接实现 INotificationHandler<T>；
+            // - 派发端口 IEventDispatcher 由基于 MediatR IPublisher 的 DomainEventDispatcher 实现；
+            // - 订阅者（*Handler）经 AsImplementedInterfaces 注册为其 INotificationHandler<T>，供 IPublisher 按类型解析。
+            builder.RegisterType<DomainEventDispatcher>().As<IEventDispatcher>();
+            builder.RegisterAssemblyTypes(Assembly.Load(BASE_HOST))
+                .Where(t => t.Name.EndsWith("Handler") && !t.IsAbstract)
+                .AsImplementedInterfaces();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

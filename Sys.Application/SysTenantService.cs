@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using OneForAll.Core.Extension;
 using Sys.Domain.Enums;
-using Sys.Domain.Repositorys;
 using Sys.Domain.Aggregates;
 using System.IO;
 using OneForAll.Core.UploadFile;
@@ -25,15 +24,15 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysTenantManager _manager;
-        private readonly ISysTenantRepository _repository;
+        private readonly ISysTenantQueryService _query;
         public SysTenantService(
             IMapper mapper,
             ISysTenantManager manager,
-            ISysTenantRepository repository)
+            ISysTenantQueryService query)
         {
             _mapper = mapper;
             _manager = manager;
-            _repository = repository;
+            _query = query;
         }
 
         #region 租户
@@ -45,7 +44,7 @@ namespace Sys.Application
         /// <returns>租户</returns>
         public async Task<SysTenantDto> GetAsync(Guid id)
         {
-            var data = await _manager.GetAsync(id);
+            var data = await _query.GetAsync(id);
             return _mapper.Map<SysTenant, SysTenantDto>(data);
         }
 
@@ -58,7 +57,7 @@ namespace Sys.Application
         {
             if (!ids.Any())
                 return Enumerable.Empty<SysTenantDto>();
-            var data = await _repository.GetListAsync(w => ids.Contains(w.Id));
+            var data = await _query.GetListByIdsAsync(ids);
             return _mapper.Map<IEnumerable<SysTenant>, IEnumerable<SysTenantDto>>(data);
         }
 
@@ -80,7 +79,7 @@ namespace Sys.Application
             DateTime? startDate,
             DateTime? endDate)
         {
-            var data = await _manager.GetPageAsync(pageIndex, pageSize, key, isEnabled, startDate, endDate);
+            var data = await _query.GetPageAsync(pageIndex, pageSize, key, isEnabled, startDate, endDate);
             var items = _mapper.Map<IEnumerable<SysTenant>, IEnumerable<SysTenantDto>>(data.Items);
             return new PageList<SysTenantDto>(data.Total, data.PageIndex, data.PageSize, items);
         }
@@ -138,7 +137,7 @@ namespace Sys.Application
         /// <returns>菜单列表</returns>
         public async Task<IEnumerable<SysMenuTreeDto>> GetListMenuAsync(Guid id)
         {
-            var data = await _manager.GetListMenuAsync(id);
+            var data = await _query.GetListMenuAsync(id);
             var menus = _mapper.Map<IEnumerable<SysMenuPermissionAggr>, IEnumerable<SysMenuTreeDto>>(data);
             return menus.ToTree<SysMenuTreeDto, Guid>();
         }
@@ -154,7 +153,7 @@ namespace Sys.Application
         /// <returns>权限列表</returns>
         public async Task<IEnumerable<SysMenuPermissionDto>> GetListPermissionAsync(Guid id)
         {
-            var data = await _manager.GetListPermissionAsync(id);
+            var data = await _query.GetListPermissionAsync(id);
             return _mapper.Map<IEnumerable<SysPermission>, IEnumerable<SysMenuPermissionDto>>(data);
         }
 

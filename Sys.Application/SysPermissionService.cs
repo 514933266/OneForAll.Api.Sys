@@ -19,12 +19,15 @@ namespace Sys.Application
     {
         private readonly IMapper _mapper;
         private readonly ISysPermissionManager _permManager;
+        private readonly ISysPermissionQueryService _query;
         public SysPermissionService(
             IMapper mapper,
-            ISysPermissionManager permManager)
+            ISysPermissionManager permManager,
+            ISysPermissionQueryService query)
         {
             _mapper = mapper;
             _permManager = permManager;
+            _query = query;
         }
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace Sys.Application
             string key,
             Guid menuId)
         {
-            var data = await _permManager.GetPageAsync(pageIndex, pageSize, key, menuId);
+            var data = await _query.GetPageAsync(pageIndex, pageSize, key, menuId);
             var items = _mapper.Map<IEnumerable<SysPermission>, IEnumerable<SysPermissionDto>>(data.Items);
             return new PageList<SysPermissionDto>(data.Total, data.PageSize, data.PageIndex, items);
         }

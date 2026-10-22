@@ -99,5 +99,46 @@ namespace Sys.Repository
 
             return await sql.ToListAsync();
         }
+
+        /// <summary>
+        /// 按appId查询微信客户端实体
+        /// </summary>
+        /// <param name="appId">微信appId</param>
+        /// <returns>微信客户端</returns>
+        public async Task<SysWechatClient> GetByAppIdAsync(string appId)
+        {
+            return await DbSet.FirstOrDefaultAsync(w => w.AppId == appId);
+        }
+
+        /// <summary>
+        /// 是否存在指定appId
+        /// </summary>
+        /// <param name="appId">微信appId</param>
+        /// <returns>是否存在</returns>
+        public async Task<bool> ExistsByAppIdAsync(string appId)
+        {
+            return await DbSet.AnyAsync(w => w.AppId == appId);
+        }
+
+        /// <summary>
+        /// 是否存在指定appId（排除自身）
+        /// </summary>
+        /// <param name="appId">微信appId</param>
+        /// <param name="excludeId">排除的实体id</param>
+        /// <returns>是否存在</returns>
+        public async Task<bool> ExistsByAppIdAsync(string appId, Guid excludeId)
+        {
+            return await DbSet.AnyAsync(w => w.AppId == appId && w.Id != excludeId);
+        }
+
+        /// <summary>
+        /// 按id集合查询列表
+        /// </summary>
+        /// <param name="ids">实体id</param>
+        /// <returns>列表</returns>
+        public async Task<IEnumerable<SysWechatClient>> GetListByIdsAsync(IEnumerable<Guid> ids)
+        {
+            return await DbSet.Where(w => ids.Contains(w.Id)).ToListAsync();
+        }
     }
 }

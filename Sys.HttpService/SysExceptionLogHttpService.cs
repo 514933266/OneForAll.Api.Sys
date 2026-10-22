@@ -18,26 +18,45 @@ namespace Sys.HttpService
     public class SysExceptionLogHttpService : BaseHttpService, ISysExceptionLogHttpService
     {
         private readonly HttpServiceConfig _config;
+        private readonly HttpServiceLogConfig _logConfig;
 
         public SysExceptionLogHttpService(
             HttpServiceConfig config,
+            HttpServiceLogConfig logConfig,
             IHttpContextAccessor httpContext,
             IHttpClientFactory httpClientFactory) : base(httpContext, httpClientFactory)
         {
             _config = config;
+            _logConfig = logConfig;
         }
 
         /// <summary>
         /// 添加
         /// </summary>
-        /// <param name="entity">实体</param>
+        /// <param name="form">实体</param>
         /// <returns></returns>
-        public async Task AddAsync(SysExceptionLogRequest entity)
+        public async Task AddAsync(SysExceptionLogRequest form)
         {
-            var client = GetHttpClient(_config.SysLog);
-            if (client != null && client.BaseAddress != null)
+            // 检查是否启用日志
+            if (!_logConfig.ExceptionLog)
+                return;
+
+            try
             {
-                await client.PostAsync("api/SysExceptionLogs", entity, new JsonMediaTypeFormatter());
+                form.CreatorId = LoginUser.Id;
+                form.CreatorName = LoginUser.DisplayName;
+                form.TenantId = LoginUser.TenantId;
+                form.CreateTime = DateTime.Now;
+
+                var client = GetHttpClient(_config.SysLog);
+                if (client != null && client.BaseAddress != null)
+                {
+                    await client.PostAsync("api/SysExceptionLogs", form, new JsonMediaTypeFormatter());
+                }
+            }
+            catch
+            {
+                // 忽略异常
             }
         }
     }

@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sys.Domain.Aggregates;
-using Sys.Domain.Repositorys;
 
 namespace Sys.Application
 {
@@ -24,19 +23,22 @@ namespace Sys.Application
         private readonly IMapper _mapper;
         private readonly ISysMenuManager _manager;
         private readonly ISysPermissionManager _permManager;
-        private readonly ISysPermissionRepository _permRepository;
+        private readonly ISysMenuQueryService _menuQuery;
+        private readonly ISysPermissionQueryService _permQuery;
 
         public SysMenuService(
             IMapper mapper,
             ISysMenuManager manager,
             ISysPermissionManager permManager,
-            ISysPermissionRepository permRepository
+            ISysMenuQueryService menuQuery,
+            ISysPermissionQueryService permQuery
             )
         {
             _mapper = mapper;
             _manager = manager;
             _permManager = permManager;
-            _permRepository = permRepository;
+            _menuQuery = menuQuery;
+            _permQuery = permQuery;
         }
 
         #region 菜单
@@ -50,7 +52,7 @@ namespace Sys.Application
         /// <returns>列表</returns>
         public async Task<IEnumerable<SysMenuTreeDto>> GetListAsync(bool hasPerms, Guid parentId, string key)
         {
-            var data = await _manager.GetListAsync(hasPerms, parentId, key);
+            var data = await _menuQuery.GetListAsync(hasPerms, parentId, key);
             var menus = _mapper.Map<IEnumerable<SysMenuPermissionAggr>, IEnumerable<SysMenuTreeDto>>(data);
             return menus.ToTree<SysMenuTreeDto, Guid>();
         }
@@ -125,7 +127,7 @@ namespace Sys.Application
         /// <returns>权限列表</returns>
         public async Task<IEnumerable<SysMenuPermissionDto>> GetListPermissionAsync(Guid id)
         {
-            var data = await _permRepository.GetListByMenuAsync(id);
+            var data = await _permQuery.GetListByMenuAsync(id);
             return _mapper.Map<IEnumerable<SysPermission>, IEnumerable<SysMenuPermissionDto>>(data);
         }
 

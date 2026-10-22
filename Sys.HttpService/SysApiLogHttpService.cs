@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
+using OneForAll.Core.Extension;
 using OneForAll.Core.OAuth;
 using Sys.HttpService.Interfaces;
 using Sys.HttpService.Models;
@@ -13,19 +14,22 @@ using System.Threading.Tasks;
 
 namespace Sys.HttpService
 {
-    // <summary>
+    /// <summary>
     /// Api日志
     /// </summary>
     public class SysApiLogHttpService : BaseHttpService, ISysApiLogHttpService
     {
         private readonly HttpServiceConfig _config;
+        private readonly HttpServiceLogConfig _logConfig;
 
         public SysApiLogHttpService(
             HttpServiceConfig config,
+            HttpServiceLogConfig logConfig,
             IHttpContextAccessor httpContext,
             IHttpClientFactory httpClientFactory) : base(httpContext, httpClientFactory)
         {
             _config = config;
+            _logConfig = logConfig;
         }
 
         /// <summary>
@@ -35,10 +39,28 @@ namespace Sys.HttpService
         /// <returns></returns>
         public async Task AddAsync(SysApiLogRequest form)
         {
-            var client = GetHttpClient(_config.SysLog);
-            if (client != null && client.BaseAddress != null)
+            // 检查是否启用日志
+            if (!_logConfig.ApiLog)
+                return;
+
+            try
             {
-                await client.PostAsync("api/SysApiLogs", form, new JsonMediaTypeFormatter());
+                if (!LoginUser.Id.IsNullOrEmpty())
+                {
+                    form.CreatorId = LoginUser.Id;
+                    form.CreatorName = LoginUser.DisplayName;
+                    form.TenantId = LoginUser.TenantId;
+                }
+
+                var client = GetHttpClient(_config.SysLog);
+                if (client != null && client.BaseAddress != null)
+                {
+                    await client.PostAsync("api/SysApiLogs", form, new JsonMediaTypeFormatter());
+                }
+            }
+            catch
+            {
+                // 忽略异常
             }
         }
     }

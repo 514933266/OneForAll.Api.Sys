@@ -5,24 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Sys.Domain.Aggregates;
 
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 用户
+    /// 用户（命令）
     /// </summary>
     public interface ISysUserManager
     {
-        /// <summary>
-        /// 获取分页
-        /// </summary>
-        /// <param name="pageIndex">页码</param>
-        /// <param name="pageSize">页数</param>
-        /// <param name="key">关键字</param>
-        /// <returns>分页</returns>
-        Task<PageList<SysUserAggr>> GetPageAsync(int pageIndex, int pageSize, string key);
-
         /// <summary>
         /// 添加
         /// </summary>

@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using OneForAll.Core.ORM;
 using Sys.Application.Dtos;
 using Sys.Application.Interfaces;
 using Sys.Domain.Entities;
 using Sys.Domain.Interfaces;
-using Sys.Domain.Repositorys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +17,13 @@ namespace Sys.Application
     public class SysWechatLoginUserService : ISysWechatLoginUserService
     {
         private readonly IMapper _mapper;
-        private readonly ISysWechatUserRepository _wxUserRepository;
-        private readonly ISysUserRepository _userRepository;
-        public SysWechatLoginUserService(IMapper mapper, ISysUserRepository userRepository, ISysWechatUserRepository wxUserRepository)
+        private readonly ISysWechatUserQueryService _wxUserQuery;
+        private readonly ISysUserQueryService _userQuery;
+        public SysWechatLoginUserService(IMapper mapper, ISysUserQueryService userQuery, ISysWechatUserQueryService wxUserQuery)
         {
             _mapper = mapper;
-            _userRepository = userRepository;
-            _wxUserRepository = wxUserRepository;
+            _userQuery = userQuery;
+            _wxUserQuery = wxUserQuery;
         }
 
         /// <summary>
@@ -37,11 +35,11 @@ namespace Sys.Application
         public async Task<SysWechatLoginUserDto> GetByMobileAsync(Guid tenantId, string mobile)
         {
             var user = new SysWechatLoginUserDto();
-            var wxUser = await _wxUserRepository.GetAsync(w => w.Mobile == mobile);
+            var wxUser = await _wxUserQuery.GetByMobileAsync(mobile);
             if (wxUser == null)
                 return user;
 
-            var data = await _userRepository.GetAsync(w => w.Id == wxUser.SysUserId && w.SysTenantId == tenantId);
+            var data = await _userQuery.GetByIdAndTenantAsync(wxUser.SysUserId, tenantId);
             return _mapper.Map<SysWechatLoginUserDto>(data);
         }
 
@@ -54,17 +52,14 @@ namespace Sys.Application
         public async Task<SysWechatLoginUserDto> GetByUnionIdAsync(Guid tenantId, string unionId)
         {
             var user = new SysWechatLoginUserDto();
-            var wxUser = await _wxUserRepository.GetAsync(w => w.UnionId == unionId);
+            var wxUser = await _wxUserQuery.GetByUnionIdAsync(unionId);
             if (wxUser == null)
                 return user;
 
-            var predicate = PredicateBuilder.Create<SysUser>(w => w.Id == wxUser.SysUserId);
-            if (tenantId != Guid.Empty)
-            {
-                // 由于UnionId具有安全性，因此可以不需要像mobile一样必传tenantId
-                predicate = predicate.And(w => w.SysTenantId == tenantId);
-            }
-            var data = await _userRepository.GetAsync(predicate);
+            // 由于UnionId具有安全性，因此可以不需要像mobile一样必传tenantId
+            var data = tenantId != Guid.Empty
+                ? await _userQuery.GetByIdAndTenantAsync(wxUser.SysUserId, tenantId)
+                : await _userQuery.GetByIdAsync(wxUser.SysUserId);
             return _mapper.Map<SysWechatLoginUserDto>(data);
         }
     }

@@ -46,14 +46,14 @@ namespace Sys.Host.Providers
             foreach (var jobSchedule in _config.ScheduleJobs)
             {
                 if (jobSchedule.JobType == null)
-                    return;
+                    continue;
                 var errType = await _jobHttpService.RegisterAsync(new HttpService.Models.JobRegisterRequest()
                 {
                     AppId = _config.AppId,
                     AppSecret = _config.AppSecret,
                     GroupName = _config.GroupName,
                     NodeName = _config.NodeName,
-                    Cron = jobSchedule.Corn,
+                    Cron = jobSchedule.Cron,
                     Name = jobSchedule.TypeName,
                     Remark = jobSchedule.Remark
                 });
@@ -99,7 +99,7 @@ namespace Sys.Host.Providers
             return TriggerBuilder
                 .Create()
                 .WithIdentity(schedule.JobType.FullName.Append(".Trigger"))
-                .WithCronSchedule(schedule.Corn)
+                .WithCronSchedule(schedule.Cron)
                 .WithDescription(schedule.JobType.Name.Append(".Trigger"))
                 .Build();
         }

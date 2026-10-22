@@ -33,5 +33,15 @@ namespace Sys.Repository
                           join contact in DbSet on user.Id equals contact.SysUserId
                           select contact).ToListAsync();
         }
+
+        /// <summary>
+        /// 查询用户权限列表
+        /// </summary>
+        /// <param name="userId">用户id</param>
+        /// <returns>权限列表</returns>
+        public async Task<IEnumerable<SysMidUserPermission>> GetListByUserAsync(Guid userId)
+        {
+            return await DbSet.Where(w => w.SysUserId == userId).ToListAsync();
+        }
     }
 }

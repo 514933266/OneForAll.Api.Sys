@@ -52,5 +52,12 @@ namespace Sys.Domain.Repositorys
         /// <param name="code">租户信用代码</param>
         /// <returns>结果</returns>
         Task<SysTenant> GetByCodeAsync(string code);
+
+        /// <summary>
+        /// 按关键字查询租户列表（下拉选项）
+        /// </summary>
+        /// <param name="key">关键字</param>
+        /// <returns>租户列表</returns>
+        Task<IEnumerable<SysTenant>> GetListByKeyAsync(string key);
     }
 }

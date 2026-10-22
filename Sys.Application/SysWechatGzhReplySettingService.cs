@@ -22,15 +22,18 @@ namespace Sys.Application
         private readonly IMapper _mapper;
         private readonly ISysWechatGzhReplySettingManager _manager;
         private readonly ISysWechatClientManager _clientManager;
+        private readonly ISysWechatGzhReplySettingQueryService _query;
 
         public SysWechatGzhReplySettingService(
             IMapper mapper,
             ISysWechatGzhReplySettingManager manager,
-            ISysWechatClientManager clientManager)
+            ISysWechatClientManager clientManager,
+            ISysWechatGzhReplySettingQueryService query)
         {
             _mapper = mapper;
             _manager = manager;
             _clientManager = clientManager;
+            _query = query;
         }
 
         /// <summary>
@@ -42,7 +45,7 @@ namespace Sys.Application
         /// <returns>分页列表</returns>
         public async Task<PageList<SysWechatGzhReplySettingDto>> GetPageAsync(int pageIndex, int pageSize, string appId)
         {
-            var data = await _manager.GetPageAsync(pageIndex, pageSize, appId);
+            var data = await _query.GetPageAsync(pageIndex, pageSize, appId);
             var items = _mapper.Map<IEnumerable<SysWechatGzhReplySettingAggr>, IEnumerable<SysWechatGzhReplySettingDto>>(data.Items);
             return new PageList<SysWechatGzhReplySettingDto>(data.Total, data.PageSize, data.PageIndex, items);
         }

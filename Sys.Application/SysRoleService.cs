@@ -22,16 +22,25 @@ namespace Sys.Application
         private readonly ISysRoleManager _roleManager;
         private readonly ISysRolePermissionManager _rolePermManager;
         private readonly ISysRoleMemberManager _roleMemberManager;
+        private readonly ISysRoleQueryService _roleQuery;
+        private readonly ISysRolePermissionQueryService _rolePermQuery;
+        private readonly ISysRoleMemberQueryService _roleMemberQuery;
         public SysRoleService(
             IMapper mapper,
             ISysRoleManager roleManager,
             ISysRolePermissionManager rolePermManager,
-            ISysRoleMemberManager roleMemberManager)
+            ISysRoleMemberManager roleMemberManager,
+            ISysRoleQueryService roleQuery,
+            ISysRolePermissionQueryService rolePermQuery,
+            ISysRoleMemberQueryService roleMemberQuery)
         {
             _mapper = mapper;
             _roleManager = roleManager;
             _rolePermManager = rolePermManager;
             _roleMemberManager = roleMemberManager;
+            _roleQuery = roleQuery;
+            _rolePermQuery = rolePermQuery;
+            _roleMemberQuery = roleMemberQuery;
         }
 
         #region 角色
@@ -45,7 +54,7 @@ namespace Sys.Application
         /// <returns>分页列表</returns>
         public async Task<PageList<SysRoleDto>> GetPageAsync(int pageIndex, int pageSize, string key)
         {
-            var data = await _roleManager.GetPageAsync(pageIndex, pageSize, key);
+            var data = await _roleQuery.GetPageAsync(pageIndex, pageSize, key);
             var items = _mapper.Map<IEnumerable<SysRole>, IEnumerable<SysRoleDto>>(data.Items);
             return new PageList<SysRoleDto>(data.Total, data.PageSize, data.PageIndex, items);
         }
@@ -92,7 +101,7 @@ namespace Sys.Application
         /// <returns>权限列表</returns>
         public async Task<IEnumerable<SysMenuPermissionDto>> GetListPermissionAsync(Guid id)
         {
-            var data = await _rolePermManager.GetListAsync(id);
+            var data = await _rolePermQuery.GetListAsync(id);
             return _mapper.Map<IEnumerable<SysPermission>, IEnumerable<SysMenuPermissionDto>>(data);
         }
 
@@ -117,7 +126,7 @@ namespace Sys.Application
         /// <returns>成员列表</returns>
         public async Task<IEnumerable<SysRoleMemberDto>> GetListMemberAsync(Guid id)
         {
-            var data = await _roleMemberManager.GetListAsync(id);
+            var data = await _roleMemberQuery.GetListAsync(id);
             return _mapper.Map<IEnumerable<SysUser>, IEnumerable<SysRoleMemberDto>>(data);
         }
 
@@ -129,7 +138,7 @@ namespace Sys.Application
         /// <returns>用户列表</returns>
         public async Task<IEnumerable<SysRoleSelectionMemberDto>> GetListUnJoinedUserAsync(Guid id, string key)
         {
-            var data = await _roleMemberManager.GetListUnJoinedAsync(id, key);
+            var data = await _roleMemberQuery.GetListUnJoinedAsync(id, key);
             return _mapper.Map<IEnumerable<SysUser>, IEnumerable<SysRoleSelectionMemberDto>>(data);
         }
 

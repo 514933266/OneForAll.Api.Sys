@@ -12,26 +12,10 @@ using System.Threading.Tasks;
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 网站设置
+    /// 网站设置（命令）
     /// </summary>
     public interface ISysWebsiteSettingManager
     {
-        /// <summary>
-        /// 获取分页
-        /// </summary>
-        /// <param name="pageIndex">页码</param>
-        /// <param name="pageSize">页数</param>
-        /// <param name="key">关键字</param>
-        /// <returns>分页</returns>
-        Task<PageList<SysWebsiteSetting>> GetPageAsync(int pageIndex, int pageSize, string key);
-
-        /// <summary>
-        /// 获取实体
-        /// </summary>
-        /// <param name="id">实体id</param>
-        /// <returns>实体</returns>
-        Task<SysWebsiteSetting> GetAsync(Guid id);
-
         /// <summary>
         /// 添加
         /// </summary>

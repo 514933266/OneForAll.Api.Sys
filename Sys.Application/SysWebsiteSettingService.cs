@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
 using OneForAll.Core.Extension;
-using Sys.Domain.Repositorys;
 using Sys.Domain.Aggregates;
 using OneForAll.Core.UploadFile;
 
@@ -26,19 +25,21 @@ namespace Sys.Application
         private readonly IMapper _mapper;
         private readonly ISysWebsiteSettingManager _manager;
         private readonly ISysWebsiteApiSettingManager _apiManager;
-
-        private readonly ISysWebsiteSettingRepository _repository;
+        private readonly ISysWebsiteSettingQueryService _query;
+        private readonly ISysWebsiteApiSettingQueryService _apiQuery;
 
         public SysWebsiteSettingService(
             IMapper mapper,
             ISysWebsiteSettingManager manager,
             ISysWebsiteApiSettingManager apiManager,
-            ISysWebsiteSettingRepository repository)
+            ISysWebsiteSettingQueryService query,
+            ISysWebsiteApiSettingQueryService apiQuery)
         {
             _mapper = mapper;
             _manager = manager;
             _apiManager = apiManager;
-            _repository = repository;
+            _query = query;
+            _apiQuery = apiQuery;
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace Sys.Application
         /// <returns>分页列表</returns>
         public async Task<PageList<SysWebsiteSettingDto>> GetPageAsync(int pageIndex, int pageSize, string key)
         {
-            var data = await _manager.GetPageAsync(pageIndex, pageSize, key);
+            var data = await _query.GetPageAsync(pageIndex, pageSize, key);
             var items = _mapper.Map<IEnumerable<SysWebsiteSetting>, IEnumerable<SysWebsiteSettingDto>>(data.Items);
             return new PageList<SysWebsiteSettingDto>(data.Total, data.PageSize, data.PageIndex, items);
         }
@@ -62,7 +63,7 @@ namespace Sys.Application
         /// <returns>实体</returns>
         public async Task<SysWebsiteSettingDto> GetAsync(Guid id)
         {
-            var data = await _manager.GetAsync(id);
+            var data = await _query.GetAsync(id);
             return _mapper.Map<SysWebsiteSetting, SysWebsiteSettingDto>(data);
         }
 
@@ -73,7 +74,7 @@ namespace Sys.Application
         /// <returns>实体</returns>
         public async Task<SysWebsiteSettingDto> GetAsync(string host)
         {
-            var data = await _repository.GetByHostWithContactAsync(host);
+            var data = await _query.GetByHostWithContactAsync(host);
             var result = _mapper.Map<SysWebsiteSettingAggr, SysWebsiteSettingDto>(data);
             if (result.Host.IsNullOrEmpty())
             {
@@ -133,7 +134,7 @@ namespace Sys.Application
         /// <returns>结果</returns>
         public async Task<IEnumerable<SysWebsiteApiSettingDto>> GetListApiAsync(Guid id)
         {
-            var data = await _apiManager.GetListAsync(id);
+            var data = await _apiQuery.GetListAsync(id);
             return _mapper.Map<IEnumerable<SysWebsiteApiSetting>, IEnumerable<SysWebsiteApiSettingDto>>(data);
         }
 

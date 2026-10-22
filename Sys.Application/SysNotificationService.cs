@@ -11,7 +11,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Sys.HttpService.Interfaces;
-using Sys.Domain.Repositorys;
 using Sys.Domain.Enums;
 using System.Linq;
 using Sys.HttpService.Models;
@@ -30,23 +29,23 @@ namespace Sys.Application
         private readonly ISysNotificationManager _manager;
         private readonly IUmsMessageHttpService _messageHttpService;
 
-        private readonly ISysUserRepository _userRepository;
-        private readonly ISysNotificationRepository _repository;
-        private readonly ISysNotificationToAccountRepository _toAccountRepository;
+        private readonly ISysUserQueryService _userQuery;
+        private readonly ISysNotificationQueryService _notifQuery;
+        private readonly ISysNotificationToAccountQueryService _toAccountQuery;
         public SysNotificationService(
             IMapper mapper,
             ISysNotificationManager manager,
             IUmsMessageHttpService messageHttpService,
-            ISysUserRepository userRepository,
-            ISysNotificationRepository repository,
-            ISysNotificationToAccountRepository toAccountRepository)
+            ISysUserQueryService userQuery,
+            ISysNotificationQueryService notifQuery,
+            ISysNotificationToAccountQueryService toAccountQuery)
         {
             _mapper = mapper;
             _manager = manager;
             _messageHttpService = messageHttpService;
-            _userRepository = userRepository;
-            _repository = repository;
-            _toAccountRepository = toAccountRepository;
+            _userQuery = userQuery;
+            _notifQuery = notifQuery;
+            _toAccountQuery = toAccountQuery;
         }
 
         /// <summary>
@@ -65,7 +64,7 @@ namespace Sys.Application
             DateTime? startDate,
             DateTime? endDate)
         {
-            var data = await _manager.GetPageAsync(pageIndex, pageSize, key, startDate, endDate);
+            var data = await _notifQuery.GetPageAsync(pageIndex, pageSize, key, startDate, endDate);
             var items = _mapper.Map<IEnumerable<SysNotification>, IEnumerable<SysNotificationDto>>(data.Items);
             return new PageList<SysNotificationDto>(data.Total, data.PageSize, data.PageIndex, items);
         }
@@ -119,7 +118,7 @@ namespace Sys.Application
         /// <returns>结果</returns>
         public async Task<BaseErrType> PublishAsync(Guid id)
         {
-            var data = await _repository.FindAsync(id);
+            var data = await _notifQuery.GetAsync(id);
             var msg = new UmsMessageRequest()
             {
                 Title = data.Title,
@@ -130,7 +129,7 @@ namespace Sys.Application
             {
                 var pageIndex = 1;
                 var pageSize = 100;
-                var users = data.Type == SysNotificationTypeEnum.AllAccount ? await _userRepository.GetPageAsync(pageIndex, pageSize) : await _userRepository.GetPageMainAccountAsync(pageIndex, pageSize);
+                var users = data.Type == SysNotificationTypeEnum.AllAccount ? await _userQuery.GetPageAllAsync(pageIndex, pageSize) : await _userQuery.GetPageMainAccountAsync(pageIndex, pageSize);
                 while (users.Any())
                 {
                     users.ForEach(e =>
@@ -140,12 +139,12 @@ namespace Sys.Application
                     });
 
                     pageIndex++;
-                    users = data.Type == SysNotificationTypeEnum.AllAccount ? await _userRepository.GetPageAsync(pageIndex, pageSize) : await _userRepository.GetPageMainAccountAsync(pageIndex, pageSize);
+                    users = data.Type == SysNotificationTypeEnum.AllAccount ? await _userQuery.GetPageAllAsync(pageIndex, pageSize) : await _userQuery.GetPageMainAccountAsync(pageIndex, pageSize);
                 }
             }
             else
             {
-                var toAccounts = await _toAccountRepository.GetListAsync(id);
+                var toAccounts = await _toAccountQuery.GetListByMessageAsync(id);
                 toAccounts.ForEach(e =>
                 {
                     msg.ToAccountId = e.UserId;

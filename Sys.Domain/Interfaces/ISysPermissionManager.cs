@@ -10,20 +10,10 @@ using Sys.Domain.Aggregates;
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 权限
+    /// 权限（命令）
     /// </summary>
     public interface ISysPermissionManager
     {
-        /// <summary>
-        /// 获取分页列表
-        /// </summary>
-        /// <param name="pageIndex">页码</param>
-        /// <param name="pageSize">页数</param>
-        /// <param name="key">关键字</param>
-        /// <param name="menuId">菜单id</param>
-        /// <returns>分页列表</returns>
-        Task<PageList<SysPermissionAggr>> GetPageAsync(int pageIndex, int pageSize, string key, Guid menuId);
-
         /// <summary>
         /// 添加
         /// </summary>

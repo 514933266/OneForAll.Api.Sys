@@ -9,17 +9,10 @@ using System.Threading.Tasks;
 namespace Sys.Domain.Interfaces
 {
     /// <summary>
-    /// 领域服务：角色权限
+    /// 领域服务：角色权限（命令）
     /// </summary>
     public interface ISysRolePermissionManager
     {
-        /// <summary>
-        /// 获取列表
-        /// </summary>
-        /// <param name="roleId">角色id</param>
-        /// <returns>权限列表</returns>
-        Task<IEnumerable<SysPermission>> GetListAsync(Guid roleId);
-
         /// <summary>
         /// 添加
         /// </summary>
