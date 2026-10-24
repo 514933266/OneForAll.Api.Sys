@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.Core.Extension;
 using OneForAll.EFCore;
@@ -16,17 +15,17 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 领域服务：角色权限（命令：设置权限）
     /// </summary>
-    public class SysRolePermissionManager : BaseManager, ISysRolePermissionManager
+    public class SysRolePermissionManager : SysDomainManager, ISysRolePermissionManager
     {
         private readonly ISysRoleRepository _roleRepository;
         private readonly ISysPermissionRepository _permRepository;
         private readonly ISysMidRolePermRepository _rolePermRepository;
 
         public SysRolePermissionManager(
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysRoleRepository roleRepository,
             ISysPermissionRepository permRepository,
-            ISysMidRolePermRepository rolePermRepository) : base(httpContextAccessor)
+            ISysMidRolePermRepository rolePermRepository) : base(currentUser)
         {
             _roleRepository = roleRepository;
             _permRepository = permRepository;

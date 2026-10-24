@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OneForAll.Core.Security;
-using Microsoft.AspNetCore.Http;
 using System.IO;
 using OneForAll.File;
 using OneForAll.Core.Extension;
@@ -21,7 +20,7 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 网站设置（命令：增删改/上传）
     /// </summary>
-    public class SysWebsiteSettingManager : BaseManager, ISysWebsiteSettingManager
+    public class SysWebsiteSettingManager : SysDomainManager, ISysWebsiteSettingManager
     {
         // 文件存储路径
         private readonly string UPLOAD_PATH = "/upload/websetting/{0}/";
@@ -35,8 +34,8 @@ namespace Sys.Domain.Managers
         public SysWebsiteSettingManager(
             IMapper mapper,
             IUploader uploader,
-            IHttpContextAccessor httpContextAccessor,
-            ISysWebsiteSettingRepository repository) : base(httpContextAccessor)
+            ICurrentUser currentUser,
+            ISysWebsiteSettingRepository repository) : base(currentUser)
         {
             _mapper = mapper;
             _uploader = uploader;

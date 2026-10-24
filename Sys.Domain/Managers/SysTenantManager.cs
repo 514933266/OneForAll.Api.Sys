@@ -16,7 +16,6 @@ using Sys.Domain.Enums;
 using Sys.Domain.Aggregates;
 using OneForAll.File;
 using System.IO;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core.UploadFile;
 
 namespace Sys.Domain.Managers
@@ -24,7 +23,7 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 租户（命令：增删改/上传/分配权限）
     /// </summary>
-    public class SysTenantManager : BaseManager, ISysTenantManager
+    public class SysTenantManager : SysDomainManager, ISysTenantManager
     {
         // 文件存储路径
         private readonly string UPLOAD_PATH = "/upload/logos/";
@@ -34,6 +33,7 @@ namespace Sys.Domain.Managers
         private readonly IMapper _mapper;
         private readonly IUploader _uploader;
         private readonly ISysTenantRepository _repository;
+        private readonly ISysTenantServiceSettingRepository _tenantSettingRepository;
         private readonly ISysPermissionRepository _permRepository;
         private readonly ISysUserRepository _userRepository;
         private readonly ISysRoleRepository _roleRepository;
@@ -45,19 +45,21 @@ namespace Sys.Domain.Managers
         public SysTenantManager(
             IMapper mapper,
             IUploader uploader,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysTenantRepository repository,
+            ISysTenantServiceSettingRepository tenantSettingRepository,
             ISysPermissionRepository permRepository,
             ISysUserRepository userRepository,
             ISysRoleRepository roleRepository,
             ISysMidTenantPermRepository tenantPermRepository,
             ISysMidUserPermRepository userPermRepository,
             ISysMidRolePermRepository rolePermRepository,
-            ISysMidRoleUserRepository roleUserRepository) : base(httpContextAccessor)
+            ISysMidRoleUserRepository roleUserRepository) : base(currentUser)
         {
             _mapper = mapper;
             _uploader = uploader;
             _repository = repository;
+            _tenantSettingRepository = tenantSettingRepository;
             _permRepository = permRepository;
             _userRepository = userRepository;
             _roleRepository = roleRepository;
@@ -177,7 +179,7 @@ namespace Sys.Domain.Managers
                 var newfileName = id.ToString() + extension;
                 var uploadPath = AppDomain.CurrentDomain.BaseDirectory + UPLOAD_PATH;
                 var virtualPath = VIRTUAL_PATH;
-                var host = _httpContextAccessor.HttpContext.Request.Scheme + "://" + _httpContextAccessor.HttpContext.Request.Host.Value;
+                var host = BaseUrl;
 
                 result = await _uploader.WriteAsync(file, uploadPath, newfileName, maxSize) as UploadResult;
                 // 设置返回虚拟路径
@@ -239,6 +241,29 @@ namespace Sys.Domain.Managers
                     await _userPermRepository.AddRangeAsync(addUserList, tran);
                 return await ResultAsync(tran.CommitAsync);
             }
+        }
+        #endregion
+
+        #region 任务
+
+        /// <summary>
+        /// 停用服务已到期的租户
+        /// </summary>
+        /// <returns>停用数量</returns>
+        public async Task<int> DisableExpiredServicesAsync()
+        {
+            var settings = await _tenantSettingRepository.GetListExpiryAsync();
+            if (settings == null || !settings.Any()) return 0;
+
+            var ids = settings.Select(s => s.Id).ToList();
+            var tenants = await _repository.GetListAsync(ids);
+            if (tenants == null) return 0;
+
+            foreach (var item in tenants)
+            {
+                item.IsEnabled = false;
+            }
+            return await _repository.SaveChangesAsync();
         }
         #endregion
     }

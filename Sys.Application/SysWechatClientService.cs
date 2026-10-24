@@ -44,6 +44,17 @@ namespace Sys.Application
         }
 
         /// <summary>
+        /// 获取指定客户端的AccessToken
+        /// </summary>
+        /// <param name="clientId">系统客户端id</param>
+        /// <returns>AccessToken</returns>
+        public async Task<string> GetAccessTokenAsync(string clientId)
+        {
+            var data = await _query.GetByClientIdAsync(clientId);
+            return data == null ? "" : data.AccessToken;
+        }
+
+        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="form">实体</param>

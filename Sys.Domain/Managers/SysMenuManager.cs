@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.Core.Extension;
 using OneForAll.EFCore;
@@ -19,16 +18,16 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 菜单（命令：增删改/克隆/启用/排序）
     /// </summary>
-    public class SysMenuManager : BaseManager, ISysMenuManager
+    public class SysMenuManager : SysDomainManager, ISysMenuManager
     {
         private readonly IMapper _mapper;
         private readonly ISysMenuRepository _repository;
         private readonly ISysPermissionRepository _permRepository;
         public SysMenuManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysMenuRepository repository,
-            ISysPermissionRepository permRepository) : base(httpContextAccessor)
+            ISysPermissionRepository permRepository) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

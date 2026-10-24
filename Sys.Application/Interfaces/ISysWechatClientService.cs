@@ -21,6 +21,13 @@ namespace Sys.Application.Interfaces
         Task<IEnumerable<SysWechatClientDto>> GetListAsync();
 
         /// <summary>
+        /// 获取指定客户端的AccessToken
+        /// </summary>
+        /// <param name="clientId">系统客户端id</param>
+        /// <returns>AccessToken</returns>
+        Task<string> GetAccessTokenAsync(string clientId);
+
+        /// <summary>
         /// 添加
         /// </summary>
         /// <param name="form">实体</param>

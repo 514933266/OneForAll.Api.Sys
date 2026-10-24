@@ -9,21 +9,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace Sys.Domain.Managers
 {
     /// <summary>
     /// 领域服务：角色（命令：增删改）
     /// </summary>
-    public class SysRoleManager : BaseManager, ISysRoleManager
+    public class SysRoleManager : SysDomainManager, ISysRoleManager
     {
         private readonly IMapper _mapper;
         private readonly ISysRoleRepository _roleRepository;
         public SysRoleManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
-            ISysRoleRepository roleRepository) : base(httpContextAccessor)
+            ICurrentUser currentUser,
+            ISysRoleRepository roleRepository) : base(currentUser)
         {
             _mapper = mapper;
             _roleRepository = roleRepository;

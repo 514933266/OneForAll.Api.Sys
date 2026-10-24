@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using Sys.Domain.Entities;
 using Sys.Domain.Interfaces;
@@ -16,14 +15,14 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 联系我们（命令：增删）
     /// </summary>
-    public class SysContactUsManager : BaseManager, ISysContactUsManager
+    public class SysContactUsManager : SysDomainManager, ISysContactUsManager
     {
         private readonly IMapper _mapper;
         private readonly ISysContactUsRepository _repository;
         public SysContactUsManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
-            ISysContactUsRepository repository) : base(httpContextAccessor)
+            ICurrentUser currentUser,
+            ISysContactUsRepository repository) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

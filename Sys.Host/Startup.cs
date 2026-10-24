@@ -20,6 +20,7 @@ using OneForAll.File;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using Sys.Domain.Interfaces;
 using Sys.Host.Filters;
 using Sys.Host.Events;
 using Sys.Host.Model;
@@ -159,6 +160,8 @@ namespace Sys.Host
             services.AddSingleton<HttpServiceConfig>();
             services.AddSingleton<IUploader, Uploader>();
             services.AddScoped<ITenantProvider, TenantProvider>();
+            // 当前登录用户端口：领域层通过 ICurrentUser 获取登录态，不直接依赖 HttpContext
+            services.AddScoped<ICurrentUser, CurrentUser>();
 
             // 注册 MediatR 核心（IPublisher/ISender 等）。领域事件即 INotification，
             // 订阅者（*Handler）在 ConfigureContainer 里以 Autofac AsImplementedInterfaces 扫描注册为 INotificationHandler<T>；

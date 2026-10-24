@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using Sys.Domain.Aggregates;
 using Sys.Domain.Entities;
@@ -17,14 +16,14 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 微信公众号消息回复（命令：增删改）
     /// </summary>
-    public class SysWechatGzhReplySettingManager : BaseManager, ISysWechatGzhReplySettingManager
+    public class SysWechatGzhReplySettingManager : SysDomainManager, ISysWechatGzhReplySettingManager
     {
         private readonly IMapper _mapper;
         private readonly ISysWechatGzhReplySettingRepository _repository;
         public SysWechatGzhReplySettingManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
-            ISysWechatGzhReplySettingRepository repository):base(httpContextAccessor)
+            ICurrentUser currentUser,
+            ISysWechatGzhReplySettingRepository repository):base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

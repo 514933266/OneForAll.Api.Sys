@@ -1,11 +1,8 @@
 ﻿using Quartz;
-using Sys.Domain.Interfaces;
-using Sys.Domain.Repositorys;
+using Sys.Application.Interfaces;
 using Sys.Host.Models;
 using Sys.HttpService.Interfaces;
 using System.Threading.Tasks;
-using Sys.Repository;
-using System.Linq;
 
 namespace Sys.Host.QuartzJobs
 {
@@ -14,12 +11,10 @@ namespace Sys.Host.QuartzJobs
     /// </summary>
     public class MonitorTenantServiceEndTimeJob : BaseLockJob
     {
-        private readonly ISysTenantRepository _tenantRepository;
-        private readonly ISysTenantServiceSettingRepository _tenantSettingRepository;
+        private readonly ISysTenantService _tenantService;
 
         public MonitorTenantServiceEndTimeJob(
-            ISysTenantRepository tenantRepository,
-            ISysTenantServiceSettingRepository tenantSettingRepository,
+            ISysTenantService tenantService,
             QuartzScheduleJobConfig jobConfig,
             AuthConfig authConfig,
             JobLockConfig lockConfig,
@@ -27,8 +22,7 @@ namespace Sys.Host.QuartzJobs
             ISysGlobalExceptionLogHttpService logHttpService)
             : base(jobConfig, authConfig, lockConfig, jobHttpService, logHttpService)
         {
-            _tenantRepository = tenantRepository;
-            _tenantSettingRepository = tenantSettingRepository;
+            _tenantService = tenantService;
         }
 
         /// <summary>
@@ -36,18 +30,7 @@ namespace Sys.Host.QuartzJobs
         /// </summary>
         protected override async Task ExecuteInternalAsync(IJobExecutionContext context)
         {
-            var effected = 0;
-            var data = await _tenantSettingRepository.GetListExpiryAsync();
-            if (data.Any())
-            {
-                var ids = data.Select(s => s.Id).ToList();
-                var tenants = await _tenantRepository.GetListAsync(ids);
-                foreach (var item in tenants)
-                {
-                    item.IsEnabled = false;
-                }
-                effected = await _tenantRepository.SaveChangesAsync();
-            }
+            var effected = await _tenantService.DisableExpiredServicesAsync();
             await AddLogAsync($"监控租户服务到期时间任务执行完成，共有{effected}个租户服务到期");
         }
     }

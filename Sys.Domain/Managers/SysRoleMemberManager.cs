@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.Core.Extension;
 using Sys.Domain.Entities;
@@ -15,16 +14,16 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 领域服务：角色成员（命令：添加/移除）
     /// </summary>
-    public class SysRoleMemberManager : BaseManager, ISysRoleMemberManager
+    public class SysRoleMemberManager : SysDomainManager, ISysRoleMemberManager
     {
         private readonly ISysRoleRepository _roleRepository;
         private readonly ISysUserRepository _userRepository;
         private readonly ISysMidRoleUserRepository _roleUserRepository;
         public SysRoleMemberManager(
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysRoleRepository roleRepository,
             ISysUserRepository userRepository,
-            ISysMidRoleUserRepository roleUserRepository) : base(httpContextAccessor)
+            ISysMidRoleUserRepository roleUserRepository) : base(currentUser)
         {
             _roleRepository = roleRepository;
             _userRepository = userRepository;

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Sys.Domain.Enums;
 
 namespace Sys.Domain.Managers
@@ -17,7 +16,7 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 网站设置-Api（命令：增删改）
     /// </summary>
-    public class SysWebsiteApiSettingManager : BaseManager, ISysWebsiteApiSettingManager
+    public class SysWebsiteApiSettingManager : SysDomainManager, ISysWebsiteApiSettingManager
     {
         private readonly IMapper _mapper;
         private readonly ISysWebsiteApiSettingRepository _repository;
@@ -25,9 +24,9 @@ namespace Sys.Domain.Managers
 
         public SysWebsiteApiSettingManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysWebsiteApiSettingRepository repository,
-            ISysWebsiteSettingRepository settingRepository) : base(httpContextAccessor)
+            ISysWebsiteSettingRepository settingRepository) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using Sys.Domain.Entities;
 using Sys.Domain.Interfaces;
@@ -16,15 +15,15 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 系统客户端（命令：增删改）
     /// </summary>
-    public class SysClientManager : BaseManager, ISysClientManager
+    public class SysClientManager : SysDomainManager, ISysClientManager
     {
         private readonly IMapper _mapper;
         private readonly ISysClientRepository _repository;
 
         public SysClientManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
-            ISysClientRepository repository) : base(httpContextAccessor)
+            ICurrentUser currentUser,
+            ISysClientRepository repository) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

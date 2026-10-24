@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using Sys.Domain.Entities;
 using Sys.Domain.Interfaces;
@@ -16,14 +15,14 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 地区（命令：增删改）
     /// </summary>
-    public class SysAreaManager : BaseManager, ISysAreaManager
+    public class SysAreaManager : SysDomainManager, ISysAreaManager
     {
         private readonly IMapper _mapper;
         private readonly ISysAreaRepository _areaRepository;
         public SysAreaManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
-            ISysAreaRepository areaRepository) : base(httpContextAccessor)
+            ICurrentUser currentUser,
+            ISysAreaRepository areaRepository) : base(currentUser)
         {
             _mapper = mapper;
             _areaRepository = areaRepository;

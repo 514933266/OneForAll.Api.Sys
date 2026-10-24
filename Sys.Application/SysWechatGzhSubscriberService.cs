@@ -6,6 +6,7 @@ using Sys.Application.Interfaces;
 using Sys.Domain.Entities;
 using Sys.Domain.Aggregates;
 using Sys.Domain.Interfaces;
+using Sys.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,13 @@ namespace Sys.Application
         private readonly IMapper _mapper;
         private readonly ISysWechatGzhSubscriberQueryService _subQuery;
         private readonly ISysWechatClientQueryService _clientQuery;
-        public SysWechatGzhSubscriberService(IMapper mapper, ISysWechatGzhSubscriberQueryService subQuery, ISysWechatClientQueryService clientQuery)
+        private readonly ISysWechatGzhManager _manager;
+        public SysWechatGzhSubscriberService(IMapper mapper, ISysWechatGzhSubscriberQueryService subQuery, ISysWechatClientQueryService clientQuery, ISysWechatGzhManager manager)
         {
             _mapper = mapper;
             _subQuery = subQuery;
             _clientQuery = clientQuery;
+            _manager = manager;
         }
 
         /// <summary>
@@ -89,6 +92,15 @@ namespace Sys.Application
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// 关联微信关注用户（补全UnionId并绑定系统用户）
+        /// </summary>
+        /// <returns>关联结果</returns>
+        public async Task<SysWechatGzhSubscriberSynResult> SynSubscribersAsync()
+        {
+            return await _manager.SynSubscribersAsync();
         }
     }
 }

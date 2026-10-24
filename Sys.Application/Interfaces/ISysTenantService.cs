@@ -72,6 +72,12 @@ namespace Sys.Application.Interfaces
         Task<BaseErrType> DeleteAsync(IEnumerable<Guid> ids);
 
         /// <summary>
+        /// 停用服务已到期的租户
+        /// </summary>
+        /// <returns>停用数量</returns>
+        Task<int> DisableExpiredServicesAsync();
+
+        /// <summary>
         /// 上传Logo图片
         /// </summary>
         /// <param name="id">项目id</param>

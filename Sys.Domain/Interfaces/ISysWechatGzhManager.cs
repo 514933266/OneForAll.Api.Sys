@@ -1,4 +1,5 @@
 ﻿using OneForAll.Core;
+using Sys.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,12 @@ namespace Sys.Domain.Interfaces
         /// <param name="xmlContent">事件内容</param>
         /// <returns></returns>
         Task<string> TextEventAsync(string appId, string xmlContent);
+
+        /// <summary>
+        /// 关联微信关注用户（补全UnionId并绑定系统用户）
+        /// </summary>
+        /// <returns>关联结果</returns>
+        Task<SysWechatGzhSubscriberSynResult> SynSubscribersAsync();
 
     }
 }

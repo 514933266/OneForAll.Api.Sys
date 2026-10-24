@@ -173,5 +173,17 @@ namespace Sys.Application
             return errType;
         }
         #endregion
+
+        #region 任务
+
+        /// <summary>
+        /// 停用服务已到期的租户
+        /// </summary>
+        /// <returns>停用数量</returns>
+        public async Task<int> DisableExpiredServicesAsync()
+        {
+            return await _manager.DisableExpiredServicesAsync();
+        }
+        #endregion
     }
 }

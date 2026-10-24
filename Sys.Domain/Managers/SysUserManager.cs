@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.Core.Extension;
 using OneForAll.Core.Security;
@@ -18,7 +17,7 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 用户（命令：增删改）
     /// </summary>
-    public class SysUserManager : BaseManager, ISysUserManager
+    public class SysUserManager : SysDomainManager, ISysUserManager
     {
         private readonly IMapper _mapper;
         private readonly ISysUserRepository _repository;
@@ -27,10 +26,10 @@ namespace Sys.Domain.Managers
 
         public SysUserManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysUserRepository repository,
             ISysTenantRepository tenantRepository,
-            ISysMidUserPermRepository userPermRepository) : base(httpContextAccessor)
+            ISysMidUserPermRepository userPermRepository) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

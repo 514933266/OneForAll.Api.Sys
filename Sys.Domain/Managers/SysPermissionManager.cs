@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.Core.Extension;
 using Sys.Domain.Aggregates;
@@ -18,14 +17,14 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 权限（命令：增删改）
     /// </summary>
-    public class SysPermissionManager : BaseManager, ISysPermissionManager
+    public class SysPermissionManager : SysDomainManager, ISysPermissionManager
     {
         private readonly IMapper _mapper;
         private readonly ISysPermissionRepository _repository;
         public SysPermissionManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
-            ISysPermissionRepository repository) : base(httpContextAccessor)
+            ICurrentUser currentUser,
+            ISysPermissionRepository repository) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

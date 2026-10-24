@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OneForAll.Core;
 using Sys.Application.Dtos;
+using Sys.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,5 +38,11 @@ namespace Sys.Application.Interfaces
         /// <param name="clientId">客户端id</param>
         /// <returns>用户</returns>
         Task<SysWechatGzhSubscriberTokenDto> GetAsync(Guid userId, string clientId);
+
+        /// <summary>
+        /// 关联微信关注用户（补全UnionId并绑定系统用户）
+        /// </summary>
+        /// <returns>关联结果</returns>
+        Task<SysWechatGzhSubscriberSynResult> SynSubscribersAsync();
     }
 }

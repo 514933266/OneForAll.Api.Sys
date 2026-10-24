@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.EFCore;
 using Sys.Domain.Entities;
@@ -18,7 +17,7 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 微信客户端（命令：增删改）
     /// </summary>
-    public class SysWechatClientManager : BaseManager, ISysWechatClientManager
+    public class SysWechatClientManager : SysDomainManager, ISysWechatClientManager
     {
         private readonly IMapper _mapper;
         private readonly ISysWechatClientRepository _repository;
@@ -26,10 +25,10 @@ namespace Sys.Domain.Managers
         private readonly ISysMidWechatClientRepository _contactRepository;
         public SysWechatClientManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysWechatClientRepository repository,
             ISysClientRepository clientRepository,
-            ISysMidWechatClientRepository contactRepository) : base(httpContextAccessor)
+            ISysMidWechatClientRepository contactRepository) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;

@@ -2,10 +2,11 @@ using AutoMapper;
 using Sys.Domain.Interfaces;
 using Sys.Domain.Models;
 using Sys.Domain.Repositorys;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.Core.Utility;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sys.Domain.Entities;
@@ -18,7 +19,7 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 微信公众号
     /// </summary>
-    public class SysWechatGzhManager : BaseManager, ISysWechatGzhManager
+    public class SysWechatGzhManager : SysDomainManager, ISysWechatGzhManager
     {
         private readonly IMapper _mapper;
         private readonly ISysUserRepository _userRepository;
@@ -32,14 +33,14 @@ namespace Sys.Domain.Managers
 
         public SysWechatGzhManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             ISysUserRepository userRepository,
             ISysWechatUserRepository wxuserRepository,
             ISysWechatGzhSubscriberRepository repository,
             ISysWechatGzhReplySettingRepository replyRepository,
             ISysWechatClientRepository wxClientRepository,
             IWechatGzhHttpService wxgzhHttpService,
-            ISysGlobalExceptionLogHttpService exHttpService) : base(httpContextAccessor)
+            ISysGlobalExceptionLogHttpService exHttpService) : base(currentUser)
         {
             _mapper = mapper;
             _repository = repository;
@@ -225,6 +226,48 @@ namespace Sys.Domain.Managers
                 return msg.GetXmlReplyContent(form.FromUserName, form.ToUserName);
 
             return "";
+        }
+
+        /// <summary>
+        /// 关联微信关注用户（补全UnionId并绑定系统用户）
+        /// </summary>
+        /// <returns>关联结果</returns>
+        public async Task<SysWechatGzhSubscriberSynResult> SynSubscribersAsync()
+        {
+            var result = new SysWechatGzhSubscriberSynResult();
+            var clients = (await _wxClientRepository.GetListAsync())?.ToList() ?? new List<SysWechatClient>();
+            var users = (await _repository.GetListUnboundAsync())?.ToList() ?? new List<SysWechatGzhSubscriber>();
+            result.TotalCount = users.Count;
+            if (users.Count == 0) return result;
+
+            foreach (var user in users)
+            {
+                var client = clients.FirstOrDefault(w => w.AppId == user.AppId);
+                if (client == null)
+                    continue;
+                if (user.UnionId.IsNullOrEmpty())
+                {
+                    var data = await _wxgzhHttpService.GetUnionIdAsync(user.OpenId, client.AccessToken);
+                    if (data != null)
+                        user.UnionId = data.UnionId ?? "";
+                }
+            }
+
+            var unionIds = users.Where(w => !w.UnionId.IsNullOrEmpty()).Select(s => s.UnionId).ToList();
+            if (!unionIds.Any()) return result;
+
+            var wxUsers = (await _wxuserRepository.GetListByUnionIdsAsync(unionIds))?.ToList() ?? new List<SysWechatUser>();
+            users.ForEach(e =>
+            {
+                var wxUser = wxUsers.FirstOrDefault(w => w.UnionId == e.UnionId);
+                if (wxUser != null)
+                {
+                    e.SysUserId = wxUser.SysUserId;
+                    e.UnionId = wxUser.UnionId ?? "";
+                }
+            });
+            result.UpdatedCount = await _repository.SaveChangesAsync();
+            return result;
         }
     }
 }

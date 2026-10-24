@@ -1,9 +1,8 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
 using OneForAll.Core.OAuth;
-using Sys.Domain.Repositorys;
+using Sys.Application.Interfaces;
 
 namespace Sys.Host.Controllers
 {
@@ -14,11 +13,11 @@ namespace Sys.Host.Controllers
     [Authorize(Roles = UserRoleType.Ruler)]
     public class SysWechatClientDataController : BaseController
     {
-        private readonly ISysWechatClientRepository _repository;
+        private readonly ISysWechatClientService _clientService;
 
-        public SysWechatClientDataController(ISysWechatClientRepository repository)
+        public SysWechatClientDataController(ISysWechatClientService clientService)
         {
-            _repository = repository;
+            _clientService = clientService;
         }
 
         /// <summary>
@@ -29,8 +28,7 @@ namespace Sys.Host.Controllers
         [Route("{clientId}/AccessToken")]
         public async Task<string> GetAsync(string clientId)
         {
-            var client = await _repository.GetByClientIdAsync(clientId);
-            return client == null ? "" : client.AccessToken;
+            return await _clientService.GetAccessTokenAsync(clientId);
         }
     }
 }

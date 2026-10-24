@@ -64,5 +64,15 @@ namespace Sys.Domain.Interfaces
 
         #endregion
 
+        #region 任务
+
+        /// <summary>
+        /// 停用服务已到期的租户
+        /// </summary>
+        /// <returns>停用数量</returns>
+        Task<int> DisableExpiredServicesAsync();
+
+        #endregion
+
     }
 }

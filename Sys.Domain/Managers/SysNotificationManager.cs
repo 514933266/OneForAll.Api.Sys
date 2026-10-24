@@ -1,5 +1,4 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using OneForAll.Core;
 using OneForAll.Core.Events;
 using OneForAll.Core.Extension;
@@ -24,7 +23,7 @@ namespace Sys.Domain.Managers
     /// <summary>
     /// 系统通知（命令：增删改/上传/发布）
     /// </summary>
-    public class SysNotificationManager : BaseManager, ISysNotificationManager
+    public class SysNotificationManager : SysDomainManager, ISysNotificationManager
     {
         // 文件存储路径
         private readonly string UPLOAD_PATH = "upload/notificatio/{0}";
@@ -39,11 +38,11 @@ namespace Sys.Domain.Managers
 
         public SysNotificationManager(
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUser currentUser,
             IUploader uploader,
             ISysNotificationRepository repository,
             ISysNotificationToAccountRepository accountRepository,
-            IEventDispatcher eventDispatcher) : base(httpContextAccessor)
+            IEventDispatcher eventDispatcher) : base(currentUser)
         {
             _mapper = mapper;
             _uploader = uploader;
